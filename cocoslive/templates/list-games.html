@@ -1,0 +1,32 @@
+{# cocos live (c) 2009 Ricardo Quesada #}
+{# http://www.cocoslive.net #}
+{# License: See LICENSE file #}
+{% extends "page.html" %}
+
+{% block content %}
+<p>This is a list of the games you have previously registered with cocos Live. To view high scores submitted for each of your games, click the game's name. To update the details of any of your games, click the "Edit game" buttons below.</p>
+
+<table class="stats">
+<thead>
+<tr class="head">
+<th>View High Scores</th><th>Scores</th><th>Edit Game</th><th>Edit Scores</th><th>Creation Date</th>
+</tr>
+</thead>
+<tbody>
+{% for game in games %}
+<tr class="{% cycle row1,row2 %}">
+<td><a href="/game-scores?gamename={{ game.name }}"><img src="/icon/game?gamename={{game.name}}">{{game.name}}</a></td>
+<td>{{game.nro_scores}}</td>
+<td><form method="get" action="/user/edit-game"><input type="hidden" name="gamename" value="{{game.name}}"><input type="submit" value="Edit Game"></form></td>
+<td><form method="get" action="/user/edit-scores"><input type="hidden" name="gamename" value="{{game.name}}"><input type="submit" value="Edit Scores"></form></td>
+<td>{{ game.creationdate|date:"d-M-y"}}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+
+{% endblock %}
+
+
+{% block sidebar %}
+{% endblock %}

@@ -1,0 +1,38 @@
+application: cocoslive
+version: 1
+runtime: python
+api_version: 1
+
+default_expiration: "1d"
+
+handlers:
+  - url: /favicon.ico
+    static_files: static/images/favicon.ico
+    upload: static/images/favicon.ico
+  
+  - url: /static/images/fileicons/.*
+    script: zip_handler.py
+
+  - url: /static/images/flags/.*
+    script: zip_handler.py
+
+  - url: /static
+    static_dir: static
+
+  - url: /load
+    script: bulk.py
+
+  - url: /api/.*
+    script: api.py
+
+  - url: /widget/.*
+    script: widget.py
+
+  - url: /user/.*
+    script: user.py
+
+  - url: /admin/.*
+    script: admin.py
+
+  - url: /.*
+    script: main.py

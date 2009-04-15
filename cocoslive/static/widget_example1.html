@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" 
+                    "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <!-- needed scripts for cocosLive widget -->
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+  <script type="text/javascript" src="http://www.cocoslive.net/static/js/cl_widget.js"></script>
+  <script type="text/javascript" src="http://www.cocoslive.net/static/js/json2.js"></script>
+
+  <!-- needed style for cocosLive widget. You can customize the style if you want -->
+  <link rel="stylesheet" type="text/css" href="http://www.cocoslive.net/static/css/cl_widget.css" />
+  
+<script>
+  var options_sapus = {
+    /* this array must be a subset of the columns that are "send to iPhone"  */
+    /* cc_pos is a virtual column. It doesn't exist in cocoslive, but it is simulated in the widget */
+    'columns' : [ 'cc_pos', 'cc_score', 'cc_country', 'usr_playername', 'usr_angle', 'usr_speed'],
+
+    /* Name of the columns. Display it in your onw language */
+    'columnsNames' : ['Pos', 'Score','Country', 'Player Name', 'Angle', 'Speed'],
+
+    /* 0 = All scores, 1 = Scores by Country */
+    'flags' : 0,
+
+    /* how many scores must be displayed per page ? */
+    'limit' : 10,
+
+    /* starting from what score. leave it in 0 */
+    'offset' : 0,
+
+    /* What's the default category ? */
+    'category' : '',
+
+    /* Game Name, as it is in CocosLive */
+    'gameName' : "Sapus Tongue",
+
+    /* Title of the table. If title='' then the title won't be displayed */
+    'title' : 'Sapus Tongue Best Scores', // this is optional
+
+    /* if the game has categories, put the categories here */
+    /* these categories MUST match with the same that are registered in cocosLive */
+    /* If you don't want categories, set it as an empty array */
+    // var categories = [];
+    'categories' : []
+  };
+
+
+/* when the DOM is ready, an AJAX request will be made */
+$(document).ready( function(){
+  cocosLiveRequestScores( "cocoslive-scores-sapus", options_sapus);
+  })
+</script>
+
+</head>
+<body>
+  <div id="cocoslive-scores-sapus" style="width:400px;">
+</body>
+</html>

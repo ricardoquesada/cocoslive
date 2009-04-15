@@ -1,0 +1,23 @@
+{# cocos live #}
+{# http://www.cocoslive.net #}
+{% extends "base.html" %}
+
+{% block title %}
+  Page Not Found - 404
+{% endblock %}
+
+{% block heading %}
+  Page Not Found
+{% endblock %}
+
+{% block content %}
+{% if error_message %}
+{{ error_message }}
+{% else %}
+  This page does not exist.
+{% endif %}
+{% endblock %}
+
+
+{% block sidebar %}
+{% endblock %}

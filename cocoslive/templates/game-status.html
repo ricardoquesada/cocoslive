@@ -1,0 +1,61 @@
+{# cocos live (c) 2009 Ricardo Quesada #}
+{# http://www.cocoslive.net #}
+{# License: See LICENSE file #}
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <title>Game Status</title>
+  <meta name="keywords" content="iphone game source code sapus tongue">
+  <meta name="description" content="sapus tongue sourcecode source code for sale. code an iphone game in hours">
+  <meta http-equiv="Content-Language" content="en-us">
+  <meta name="Copyright" content="Copyright (c) 2008 Ricardo Quesada">
+</head>
+<body>
+
+<body>
+
+<h3>Game Status</h3>
+
+<p>
+Game Name: <b>{{game.name}}</b></br>
+Game Homepage: <a href="{{game.homepage}}">{{game.homepage}}</a><br>
+Game Key: {{game.gamekey}}
+</p>
+
+<h3>Edit fields: <a href="/edit-game?gamename={{game.name}}">edit fields</a></h3>
+<!-- fields -->
+<table border=1>
+<tr>
+<th>Name</th><th>Type</td><th>Send</th><th>Admin</th>
+</tr>
+
+{% for field in fields %}
+<tr>
+<td>{{field.name}}</td><td>{{field.type}}</td><td>{{field.send}}</td><td>{{field.admin}}</td>
+</tr>
+{% endfor %}
+</table>
+
+<!-- scores -->
+<table border=1>
+<tr>
+<th>Key</th>
+{% for field in fields %}
+<th>{{field.name}}</th>
+{% endfor %}
+</tr>
+
+{% for score in scores %}
+<tr>
+<td><a href="/delete-score?key={{ score.key }}&gamename={{game.name}}">Delete Score</a></td>
+{% for field in fields %}
+<td> {{score|getfield:field.name}} </td>
+{% endfor %}
+</tr>
+{% endfor %}
+
+</table>
+
+</body>
+</html>

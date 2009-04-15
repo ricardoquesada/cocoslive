@@ -1,0 +1,19 @@
+{# cocos live #}
+{# http://www.cocoslive.net #}
+{% extends "base.html" %}
+
+{% block title %}
+  Server Error - 500
+{% endblock %}
+
+{% block heading %}
+  Server Error
+{% endblock %}
+
+{% block content %}
+{% if error_message %}
+{{ error_message }}
+{% else %}
+  Server Error
+{% endif %}
+{% endblock %}

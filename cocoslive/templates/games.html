@@ -1,0 +1,27 @@
+{# cocos live (c) 2009 Ricardo Quesada #}
+{# http://www.cocoslive.net #}
+{# License: See LICENSE file #}
+{% extends "page.html" %}
+
+{% block sidebar %}
+{% endblock %}
+
+{% block content %}
+<p>This is a list of all games currently using Cocos Live for online score submissions:</p>
+
+<table class="stats">
+<thead>
+  <tr class="head"><th>Icon</th><th>View High Scores</th><th>Total number of Scores</th></tr>
+</thead>
+<tbody>
+{% for game in games %}
+<tr class="{% cycle row1,row2 %}">
+  <td><img src="/icon/game?gamename={{game.name}}" title="{{game.name}}"></td>
+  <td><a href="game-scores?gamename={{game.name}}" title="{{game.name}} high scores">{{game.name}}</a></td>
+  <td>{{game.nro_scores}}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+
+{% endblock %}

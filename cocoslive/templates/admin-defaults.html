@@ -1,0 +1,45 @@
+{# cocos live (c) 2009 Ricardo Quesada #}
+{# http://www.cocoslive.net #}
+{# License: See LICENSE file #}
+{% extends "page.html" %}
+
+{% block sidebar %}
+{% endblock %}
+
+{% block content %}
+
+<div>
+<img src="/icon/default?icontype=game" title="game default icon">
+</div>
+<div>
+<img src="/icon/default?icontype=dev" title="developer default icon">
+</div>
+<br>
+
+<div>
+<form action="/admin/default-values" enctype="multipart/form-data" method="post" id="default_form">
+<fieldset><legend>Default Values</legend>
+
+  <div><label>Game Icon:<a href="#" onclick='$("#game_icon_help").toggle(); return false;'>?</a></label>
+      <input type="file" name="game_icon"/>
+  </div> 
+  <div id="game_icon_help" class="help">
+  Shall be a .PNG file. Image will be scaled to 57x57.
+  </div>
+  <script>$("#game_icon_help").hide();</script>
+
+  <div><label>Developer Icon:<a href="#" onclick='$("#dev_icon_help").toggle(); return false;'>?</a></label>
+      <input type="file" name="dev_icon"/>
+  </div> 
+  <div id="dev_icon_help" class="help">
+  Shall be a .PNG file. Image will be scaled to 57x57.
+  </div>
+  <script>$("#dev_icon_help").hide();</script>
+
+  <div><input type="hidden" name="type" value="update_defaults"></div>
+</fieldset>
+<p><a href="#" onclick="$('#default_form').submit();" class="button positive"><img src="/static/bt/img/icons/tick.png" />Update Properties</a></p>
+</form>
+</div>
+
+{% endblock %}

@@ -1,0 +1,42 @@
+{# cocos live (c) 2009 Ricardo Quesada #}
+{# http://www.cocoslive.net #}
+{# License: See LICENSE file #}
+{% extends "page.html" %}
+
+{% block sidebar %}
+{% endblock %}
+
+{% block content %}
+<p>If you have trouble using this service, check out the following list of frequently asked questions before attempting other forms of contact:</p>
+<ul>
+  <li><a href="#faq1">What is cocos Live?</a></li>
+  <li><a href="#faq2">How much does it cost?</a></li>
+  <li><a href="#faq3">What do I need to become a registered member?</a></li>
+  <li><a href="#faq4">How do I check my game's table scores?</a></li>
+  <li><a href="#faq5">How can I submit scores to cocos Live?</a></li>
+  <li><a href="#faq6">Do I need to use cocos2d to use cocos Live?</a></li>
+</ul>
+
+<h3 id="faq1">Q: What is cocos Live?</h3>
+<p><i>A</i>: cocos Live is a service that tries to help iPhone Indie Game Developers by giving them an API to solve their <i>online</i> requirements.</p>
+<p>cocos Live is a reliable service with good bandwith, since it is hosted in <a href="http://code.google.com/appengine/">Google App Engine</a>.</p>
+<p>As of version 0.1, the only feature available is the High Score Server. Future versions will have more features.</p>
+
+<h3 id="faq2">Q: How much does it cost?</h3>
+<p><i>A</i>: cocos Live is a free service. You can host as many games as you want in cocos Live.</p>
+<p>cocos Live, as it was mentioned before, is hosted in <a href="http://code.google.com/appengine/">Google App Engine</a>. All the services that are hosted in GAE, like cocos Live, have certain quota-limitations. If one game consumes most of the available quota (probably because it is a very successful game), the owner of the game will be asked if he can help to pay for additional quotas.
+</p>
+
+<h3 id="faq3">Q: What do I need to become a registered member?</h3>
+<p><i>A</i>: You need a valid Google Account. Once you have one, you can sign in into cocos Live using that account.</p>
+
+<h3 id="faq4">Q: How do I check my game's table scores?</h3>
+<p><i>A</i>: To check your game's table score, you must first sign in, and then click on the <span style="font-style:italic;">Game You Have Added</span> on the navigation bar.</p>
+
+<h3 id="faq5">Q: How can I submit scores to cocos Live?</h3>
+<p><i>A</i>: You need to use the cocos Live client that is shipped within the <a href="http://code.google.com/p/cocos2d-iphone">cocos2d for iPhone</a> package.</p>
+
+<h3 id="faq6">Q: Do I need to use cocos2d to use cocos Live?</h3>
+<p><i>A</i>: No, cocos Live can be used as a stand-alone library. You can use it with <a href="http://code.google.com/p/cocos2d-iphone">cocos2d</a>, <a href="http://code.google.com/p/oolongengine/">oolong</a> or any other engine.</p>
+
+{% endblock %}

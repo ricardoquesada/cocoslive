@@ -1,0 +1,69 @@
+{# cocos live (c) 2009 Ricardo Quesada #}
+{# http://www.cocoslive.net #}
+{# License: See LICENSE file #}
+{% extends "page.html" %}
+
+{% block content %}
+<div>Company Name: {{dev.name}}</div>
+<div>Company Homepage: <a href="{{dev.homepage}}">{{dev.homepage}}</a></div>
+
+<div>
+<img src="/icon/dev?devname={{dev.user.email}}">
+</div>
+<br>
+
+<div>
+<form action="/user/edit-dev" enctype="multipart/form-data" method="post" id="dev_form">
+<fieldset><legend>Company Properties</legend>
+
+  <div><label>Company Name:<a href="#" onclick='$("#company_help").toggle(); return false;'>?</a></label>
+      <input type="text" name="name" value="{{dev.name}}" size="40"/>
+  </div>
+  <div id="company_help" class="help">
+  Your company name. Use the same company name that you are using in the App Store.
+  </div>
+  <script>$("#company_help").hide();</script>
+
+  <div><label>Company Homepage:<a href="#" onclick='$("#homepage_help").toggle(); return false;'>?</a></label>
+      <input type="text" name="homepage" value="{{dev.homepage}}" size="40"/>
+  </div>
+  <div id="homepage_help" class="help">
+  Your company homepage URL.
+  </div>
+  <script>$("#homepage_help").hide();</script>
+
+  <div><label>Icon:<a href="#" onclick='$("#icon_help").toggle(); return false;'>?</a></label>
+      <input type="file" name="icon"/>
+  </div> 
+  <div id="icon_help" class="help">
+  Shall be a .PNG file. Image will be scaled to 57x57.
+  </div>
+  <script>$("#icon_help").hide();</script>
+
+  <div><label>Receive updates by email:<a href="#" onclick='$("#update_help").toggle(); return false;'>?</a></label>
+    <select name="receive_updates">
+        {% if dev.receive_updates %}
+            <option selected>True</option>
+            <option>False</option>
+        {% else %}
+            <option>True</option>
+            <option selected>False</option>
+        {% endif %}
+    </select>
+  </div> 
+  <div id="update_help" class="help">
+  If <i>True</i> you will receive an email information regarding the updates of the server such as new features, scheduled updates, etc.
+  </div>
+  <script>$("#update_help").hide();</script>
+
+  <div><input type="hidden" name="type" value="update_properties"></div>
+
+  <p><a href="#" onclick="$('#dev_form').submit();" class="button positive"><img src="/static/bt/img/icons/tick.png" />Update Properties</a></p>
+</fieldset>
+</form>
+</div>
+
+{% endblock %}
+
+{% block sidebar %}
+{% endblock %}

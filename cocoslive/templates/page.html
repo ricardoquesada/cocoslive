@@ -1,0 +1,65 @@
+{# cocos live #}
+{# http://www.cocoslive.net #}
+{% extends "base.html" %}
+
+{% block title %}cocos Live: {{ page.title|escape }}{% endblock %}
+
+{% block navbar %}
+  {% if is_editor %}
+<ul id="editor_tools">
+  <li><h3>Editor Tools</h3></li>
+  <li><a href="{% url views.admin.edit_page page.key.id %}">Edit page</a></li>
+  <li><a href="{% url views.admin.new_page page.key.id %}">Add child</a></li>
+</div>
+  {% endif %}
+<ul id="left_nav">
+  <li><h3>Navigation</h3></li>
+  {% if user %}
+  <li><a href="/user/list-games">Games You Have Added</a></li>
+  <li><a href="/user/create-game">Add New Game</a></li>
+  {% else %}
+  <li><a href="/user/create-game">Add Your Own Game</a></li>
+  {% endif %}
+  <li><a href="/faq">Frequently Asked Questions</a></li>
+  <li><a href="/help">Help Desk</a></li>
+</ul>
+{% endblock %}
+
+{% block heading %}
+  <h2 class="fancy">{{ page.title|escape }}</h2>
+{% endblock %}
+
+{% block content %}
+  {% if page.breadcrumbs %}
+    <div class="breadcrumbs">
+    {% for breadcrumb in page.breadcrumbs %}
+      <a href="{{ breadcrumb.path }}">{{ breadcrumb.name }}</a>
+      {% if not forloop.last %}
+        &gt;
+      {% endif %}
+    {% endfor %}
+    </div>
+  {% endif %}
+  {% if page.content %}
+    {{ page.content }}
+  {% else %}
+    This page does not yet have any content.
+  {% endif %}
+
+  {% if files %}
+  <div id="attachments">
+    <h1>Attached files:</h1>
+    <ul style="list-style-type:none">
+    {% for file in files %}
+      <li style="list-style-image:url({{file.icon}})">
+      {% if file.url %}
+        <a href="{{ file.url }}">
+      {% else %}
+        <a href="{% url views.main.get_url file.path %}">
+      {% endif %}
+          {{ file.name }}</a>
+    {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,170 @@
+{# cocos live (c) 2009 Ricardo Quesada #}
+{# http://www.cocoslive.net #}
+{# License: See LICENSE file #}
+{% extends "page.html" %}
+
+{# load custom javascript #}
+{% block includes %}
+<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+<script type="text/javascript">
+    {% if supports_flash %}
+    google.load('visualization', '1', {packages: ['GeoMap']});
+    {% else %}
+    google.load('visualization', '1', {packages: ['IntensityMap']});
+    {% endif %}
+
+    function drawVisualization() {
+      var data = new google.visualization.DataTable();
+
+      {% if supports_flash %}
+      data.addColumn('string', 'Country');
+      data.addColumn('number', 'Scores');
+      {% else %}
+      data.addColumn('string', 'Country', 'Country2');
+      data.addColumn('number', 'Scores', 'Scores2');
+      {% endif %}
+      {% if total_countries %}
+      data.addRows( {{ total_countries }} );
+
+          {% for sc in scores_by_country %}
+          data.setValue( {{ forloop.counter0 }}, 0, '{{ sc.country_code|upper }}' );
+          data.setValue( {{ forloop.counter0 }}, 1, {{ sc.quantity }} );
+          {% endfor %}
+      {% else %}
+      {# XXX: hack, since Geo Map doesn't display empty maps #}
+          data.addRows( 1 );
+          data.setValue( 0, 0, 'ZZ' );
+          data.setValue( 0, 1, 0);
+      {% endif %}
+
+      var options = {};
+      {% if supports_flash %}
+      options['dataMode'] = 'regions';
+      options['showLegend'] = false;
+      options['width'] = 400;
+      options['height'] = 250;
+      {% else %}
+          {# IntesityMap only #}
+      {% endif %}
+
+      var container = document.getElementById('cc_geomap');
+      {% if supports_flash %}
+      var geomap = new google.visualization.GeoMap(container);
+      {% else %}
+      var geomap = new google.visualization.IntensityMap(container);
+      {% endif %}
+      geomap.draw(data, options);
+
+      {% if supports_flash %}
+      google.visualization.events.addListener(
+          geomap, 'regionClick', function(country_code) {
+              location.href="game-scores?gamename={{game.name}}&category={{category}}&offset=0&country=" + country_code['region'].toLowerCase();
+              }
+      ); 
+      {% endif %}
+    }
+    google.setOnLoadCallback(drawVisualization);
+
+</script>
+{% endblock %}
+
+{% block content %}
+{# game info: homepage and icon #}
+<br />
+<div id="cc_geomap" class="span-9" style="float: right"></div>
+<div id="game_info" class="span-8" style="float: left">
+<p>
+{% ifnotequal game.homepage "http://example.com" %}
+<a href="{{game.homepage}}" title="{{game.name}} homepage"><img src="/icon/game?gamename={{game.name}}"></a>
+{% endifnotequal %}
+
+{% ifnotequal dev.homepage "http://example.com" %}
+<a href="{{dev.homepage}}" title="{{dev.name}} homepage"><img src="/icon/dev?devname={{dev.user.email}}" alt="{{dev.name}}" name="{{dev.name}}"></a>
+{% endifnotequal %}
+
+{% ifnotequal game.appstore "http://www.example.com" %}
+<a href="{{game.appstore}}" title="Get it from the App Store"><img src="static/images/App_Store_badge.png"></a>
+{% endifnotequal %}
+</p>
+
+<form method="get" action="game-scores" onsubmit="return false;" style="float: left" id="filters_form">
+<fieldset><legend>Filter Scores</legend>
+  <p>{% include "select-country.html" %}</p>
+  {% if categories|first %}
+  <p>Categories: {% for cat in categories %}<a href="game-scores?gamename={{game.name}}&category={{cat.name}}&country={{country}}&deviceid={{deviceid}}">{{cat.name}}</a> |{% endfor %}</p>
+  {% else %}
+  <p>There are no score categories.</p>
+  {% endif %}
+  
+  {% if country or category or deviceid %}
+  <p><strong>Showing scores for:</strong><br />
+  {% if country %}- country: {{country|upper}} (<a href="game-scores?gamename={{game.name}}&category={{cat.name}}">remove filter</a>)<br/>{% endif %}
+  {% if category %}- category: {{category}}<br/>{% endif %}
+  {% if deviceid %}- device: {{deviceid}} (<a href="game-scores?gamename={{game.name}}&category={{cat.name}}">remove filter</a>)<br/>{% endif %}
+  </p>
+  {% endif %}
+</fieldset>
+<input type="hidden" name="gamename" value="{{game.name}}">
+<input type="hidden" name="category" value="{{category}}">
+</form>
+</div>
+
+<div style="clear: both; padding-top: 1em">
+{# Prev & Next #}
+<div>{% if not show_prev  %}< Prev{% else %}<a href="game-scores?gamename={{game.name}}&category={{category}}&offset={{prev_offset}}&country={{country}}">< Prev</a>{% endif %} | {{offset|add:1}}-{{offset|add:20}} | {% if not show_next %}Next >{% else %}<a href="game-scores?gamename={{game.name}}&category={{category}}&offset={{next_offset}}&country={{country}}">Next ></a>{% endif %}
+</div>
+
+{# table score header #}
+<div><table class='stats'>
+<tr>
+<th>Pos</th>
+{% for field in fields %}
+    {% if field.displayweb%}
+        <th>{{field.name|prettyfield}}</th>
+    {% endif %}
+{% endfor %}
+</tr>
+
+{# table score data #}
+{% for score in scores %}
+<tr class="{% cycle row1,row2 %}">
+<td>{{ forloop.counter|add:offset }}</td>
+{% for field in fields %}
+    {% if field.displayweb%}
+        {% ifequal field.name "cc_country" %}
+            <td>
+            <a href="game-scores?gamename={{game.name}}&category={{category}}&country={{score|getfield:field.name}}">
+            <img src="/static/images/flags/{{score|getfield:field.name}}.png" alt="{{score|getfield:field.name}}" title="{{score|getfield:field.name}}">
+            </a>
+            </td>
+        {% else %}
+            {% ifequal field.name "cc_when" %}
+                <td> {{score|getfield:field.name|date:"d-M-y"}} </td>
+            {% else %}
+                {% ifequal field.name "cc_device_id" %}
+                    <td>
+                    <a href="game-scores?gamename={{game.name}}&category={{category}}&deviceid={{score|getfield:field.name}}">
+                    {{score|getfield:field.name|stringformat:".5s..."}}
+                    </a>
+                    </td>
+                {% else %}
+                    <td> {{score|getfield:field.name}} </td>
+                {% endifequal %}
+            {% endifequal %}
+        {% endifequal %}
+    {% endif %}
+{% endfor %}
+</tr>
+{% endfor %}
+
+</table></div>
+{# Prev & Next #}
+<div>{% if not show_prev  %}< Prev{% else %}<a href="game-scores?gamename={{game.name}}&category={{category}}&offset={{prev_offset}}&country={{country}}">< Prev</a>{% endif %} | {{offset|add:1}}-{{offset|add:20}} | {% if not show_next %}Next >{% else %}<a href="game-scores?gamename={{game.name}}&category={{category}}&offset={{next_offset}}&country={{country}}">Next ></a>{% endif %}
+</div>
+
+</div>
+
+{% endblock %}
+
+{% block sidebar %}
+{% endblock %}

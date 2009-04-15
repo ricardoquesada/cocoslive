@@ -1,0 +1,44 @@
+{# cocos live (c) 2009 Ricardo Quesada #}
+{# http://www.cocoslive.net #}
+{# License: See LICENSE file #}
+{% extends "page.html" %}
+
+{% block content %}
+<p>Type the name of your game and its home page on your own website. You will be able to input additional details about it in your Games section.</p>
+
+<form action="/user/create-game" method="post" accept-charset="utf-8" id="new_game_form">
+<fieldset><legend>Summary</legend>
+  <div><label>Game Name: <a href="#" onclick='$("#gamename_help").toggle();return false;'>?</a></label><input type="text" name="name" value="GameName"/></p>
+  </div>
+  <div id="gamename_help" class="help">
+  The name of the game. Try to use the same name that you have used in the App Store.<br/>
+  This value CAN'T be modified after the game was created.
+  </div>
+  <script>$("#gamename_help").hide();</script>
+
+  <div><label>Score Type: <a href="#" onclick='$("#score_type_help").toggle();return false;'>?</a></label>
+  <select name="score_type">
+        <option selected>int</option>
+        <option>float</option>
+        <option>string</option>
+    </select>
+  </div>
+  <div id="score_type_help" class="help">
+  The score type. Are you going to use <i>Integers</i>, <i>Floats</i> or <i>Strings</i> to store your scores.<br/>
+  This value CAN'T be modified after the game was created.
+  </div>
+  <script>$("#score_type_help").hide();</script>
+
+  <div><label>Game Homepage: <a href="#" onclick='$("#homepage_help").toggle();return false;'>?</a></label> <input type="text" name="homepage" value="http://example.com"/></div>
+  <div id="homepage_help" class="help">
+  The game homepage URL.<br>
+  This parameter can be modified while you edit your game properties.
+  </div>
+  <script>$("#homepage_help").hide();</script>
+</fieldset>
+<p><a href="#" onclick="$('#new_game_form').submit()" class="button positive"><img src="/static/bt/img/icons/tick.png" />Create New Game</a></p>
+</form>
+{% endblock %}
+
+{% block sidebar %}
+{% endblock %}

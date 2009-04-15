@@ -1,0 +1,54 @@
+v0.3.1 - xx-Mar-2009
+ . Post: Update score is only updated if the score is better than the previous one
+ . EditGame: create cc_playername if it doesnt exists when compatibility is enabled
+
+v0.3.0 - 20-Mar-2009
+ . Admin: View developers who want to receive email updates
+ . Developer: added 'receive email updates' (False by default)
+ . EditScores: Possibility to Delete scores
+ . EditGame: Admin can edit games too
+ . EditGame: Added 'compatibiliy mode'
+ . Faq: added 'Do I need to use cocos2d to use cocos Live?'
+ . GameScores: Only show the 1st 5 chars of the device id
+ . Help: Added new link to cocos Live forum
+ . ListGames: Shows icon game. Has link to "edit scores"
+ . Main: 5 games that are ready are taken at random
+ . Post: added "update score" using cc_playername + cc_device_id as key
+ . Post: 'cc_playername' is compulsory
+
+v0.2.1 - XX-Mar-2009
+ . Admin: better admin interface
+ . Icons: Added default icons
+
+v0.2.0 - 04-Mar-2009
+ . Admin: easier way to view active games. Possibility to "feature" a game or not
+ . EditGame: Games has a 'featured' property. If ON, they will be displayed on index.html
+ . EditGame: Delete Game and Delete Scores ask for confirmation
+ . EditGame: 'Publish game to frontpage' renamed to 'Game is ready'
+ . EditGame: Added help in 'Score order','Game is ready' and 'Categories'
+ . CreateGame: Added help for gamename, scoretype and homepage
+ . GameScores: If game homepage / dev homepage / app store URL is not set they are not displayed
+ . ListGames: Show creation date instead of the game key. Order games by creation date
+ . Main: Featured games are different from "ready games"
+ . Model: cc_playername added. Shall be used to save the nick name/ player_name/ etc.
+ . Post: Posting scores are encapsulated in a transaction
+ . Settings: Added help for company name, company icon and company URL
+ . Widgets: Initial version of widgets. Added 2 examples of how to use them
+
+v0.1.3 - 02-Mar-2009
+ . Scores are are encoded in UTF-8
+ . Widget prototype working
+
+v0.1.2 - 26-Feb-2009
+ . Possibility to delete categories from games
+ . Developer is created when adding a new game
+ . Possibility to see the CHANGELOG.txt from News
+
+ v0.1.1 - 25-Feb-2009
+  . It is possible to filter scores by Device ID
+  . SendBank and DisplayOnWeb splitted
+  . "Flag" is clickable. Will filter by country
+  . "DeviceID" is clickable. Will filter by Device ID
+
+v0.1.0 - 19-Feb-2009
+  . Initial version

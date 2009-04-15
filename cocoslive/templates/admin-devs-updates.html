@@ -1,0 +1,27 @@
+{# cocos live (c) 2009 Ricardo Quesada #}
+{# http://www.cocoslive.net #}
+{# License: See LICENSE file #}
+{% extends "page.html" %}
+
+{% block sidebar %}
+{% endblock %}
+
+{% block content %}
+
+<div>
+<table class="stats">
+<thead>
+    <tr><th>Update</th><th>Mail</th><th>Real Name</th><th>Homepage</th><th>Creation Date</th></tr>
+</thead>
+
+<tbody>
+{% for dev in devs %}
+    <tr>
+      <td>{{dev.receive_updates}}</td><td>{{dev.user.email}}</td><td>{{ dev.name}}</td><td><a href="{{dev.homepage}}">{{dev.homepage}}</a></td><td>{{dev.creationdate|date:"d-M-y"}}</td>
+    </tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+
+{% endblock %}

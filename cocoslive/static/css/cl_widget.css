@@ -1,0 +1,28 @@
+/*
+ * cocosLive widget ccs file
+ * (c) Sapus Media
+ */
+table.ccl-stats {
+  width: 100%;
+  border: 1px solid #beba99;
+  border-spacing: 0pt;
+  border-collapse: collapse;
+}  
+  table.ccl-stats, table.ccl-stats td, table.ccl-stats th, table.ccl-stats thead, caption {
+    border-color: #BEBA99;
+    border-bottom:1px solid #DDDDDD;
+    border-right:1px solid #CCCCCC;
+  }
+  table.ccl-stats td, table.ccl-stats th {
+    padding: 0.3em 0.5em;
+  }
+  table.ccl-stats tr.ccl-row2 td {
+    background-color: #EFEDE0;
+  }
+  table.ccl-stats th,caption {
+    background-color: #4A382B;
+    color: #BEBA99;
+  }
+    table.ccl-stats td form {
+      margin: 0;
+    }

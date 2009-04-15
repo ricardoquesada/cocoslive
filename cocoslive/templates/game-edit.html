@@ -1,0 +1,242 @@
+{# cocos live (c) 2009 Ricardo Quesada #}
+{# http://www.cocoslive.net #}
+{# License: See LICENSE file #}
+{% extends "page.html" %}
+
+{% block content %}
+
+{# Game Info #}
+<p>Game Homepage: <a href="{{game.homepage}}">{{game.homepage}}</a><br />
+Game Secret Key: {{game.gamekey}}<br />
+Game App Store URL: {{game.appstore}}<br />
+<img src="/icon/game?gamename={{game.name}}"></p>
+
+{# Game Properties: Homepage, URL, Icon, Score Order, Publish in front page, etc. #}
+<div>
+<form action="/user/edit-game" enctype="multipart/form-data" method="post" id="game_props_form">
+<fieldset><legend>Game Properties</legend>
+            <div><label>Game Homepage:</label>
+                <input type="text" name="homepage" value="{{game.homepage}}" size="40"/>
+            </div>
+            <div><label>App Store URL:</label>
+                <input type="text" name="appstore" value="{{game.appstore}}" size="40"/>
+            </div>
+            <div><label>Score Order: <a href="#" onClick='$("#score_order_help").toggle();return false;'>?</a></label>
+            <select name="scoreorder">
+                {% ifequal game.scoreorder 'desc' %}
+                    <option selected>desc</option>
+                    <option>asc</option>
+                {% else %}
+                    <option>desc</option>
+                    <option selected>asc</option>
+                {% endifequal %}
+            </select>
+            </div>
+            <div id="score_order_help" class="help">
+                <strong>asc:</strong> Ascending order. 1,2,3,... 1 is the best score<br>
+                <strong>desc:</strong>Descending order. 10,9,8... 10 is the best score.</div>
+            <script>$("#score_order_help").hide();</script>
+
+            <div><label>Game is ready: <a href="#" onclick='$("#game_ready_help").toggle();return false;'>?</a></label>
+            <select name="publish">
+                {% if game.publish %}
+                    <option>False</option>
+                    <option selected>True</option>
+                {% else %}
+                    <option selected>False</option>
+                    <option>True</option>
+                {% endif %}
+            </select>
+            </div>
+            <div id="game_ready_help" class="help">
+            Set to <strong>True</strong> ONLY when your game is ready. These are the conditions:
+            <ul>
+                <li>Your game, which uses cocosLive, <i>Ready for Sale</i> on the App Store</li>
+                <li>You have uploaded the icon of your game</li>
+                <li>You have provided the correct App Store URL</li>
+            </ul>
+            When your game is <i>ready</i> it will be displayed on the <strong>Games</strong> tab.
+            </div>
+            <script>$("#game_ready_help").hide();</script>
+
+            <div><label>Game Icon:<a href="#" onclick='$("#icon_help").toggle();return false;'>?</a></label>
+                <input type="file" name="icon"/>
+            </div>
+            <div id="icon_help" class="help">Shall be a .PNG file. Image will be scaled to 57x57. If unsure use the same icon that you have used for your game.</div>
+            <script>$("#icon_help").hide();</script>
+
+            <div><input type="hidden" name="gamename" value="{{game.name}}"></div>
+            <div><input type="hidden" name="type" value="update_properties"></div>
+<p><a href="#" onclick="$('#game_props_form').submit()" class="button positive"><img src="/static/bt/img/icons/tick.png" />Update Game Properties</a></p>
+</fieldset>
+</form>
+</div>
+
+{# Compatibility #}
+<div>
+<form action="/user/edit-game" method="post" id="new_playername_form">
+<fieldset><legend>Compatibility</legend>
+            <div><label>Use both <i>cc_playername</i> and <i>usr_playername</i>: <a href="#" onClick='$("#new_playername_help").toggle();return false;'>?</a></label>
+            <select name="new_playername">
+                {% if game.use_new_playername %}
+                    <option selected>True</option>
+                    <option>False</option>
+                {% else %}
+                    <option>True</option>
+                    <option selected>False</option>
+                {% endif %}
+            </select>
+            </div>
+            <div id="new_playername_help" class="help">
+            Set to <strong>True</strong> if you wish to use the new <i>cc_playername</i> field AND your game is already using <i>usr_playername</i>.<br>
+            If your game is not using <i>usr_playername</i>, then set this value as <strong>False</strong>.<br>
+            When enabled, all new scores submitted with the <i>usr_playername</i> will be also copied to the <i>cc_playername</i> field.<br>
+            </div>
+            <script>$("#new_playername_help").hide();</script>
+
+            <div><input type="hidden" name="gamename" value="{{game.name}}"></div>
+            <div><input type="hidden" name="type" value="use_new_playername"></div>
+
+            <p><a href="#" onclick="$('#new_playername_form').submit()" class="button positive"><img src="/static/bt/img/icons/tick.png" />Update Compatibility Properties</a></p>
+</fieldset>
+</form>
+</div>
+
+{# Categories #}
+<div style="clear: both; padding-top: 1em">
+<fieldset><legend>Game's categories</legend>
+<div><label>Help:<a href="#" onclick='$("#category_help").toggle();return false;')>?</a></label></div>
+<div id="category_help" class="help">Add here the different categories that your game will use. Eg: <strong><i>easy</i>, <i>medium</i>, <i>hard</i></strong>, etc.<br/>If your game doesn't use any category, don't add anything.</div>
+<script>$("#category_help").hide();</script>
+
+<table class="stats" style="margin-bottom: 0">
+<tr class="head"><th>Category Name</th><th>Action</td></tr>
+
+{% for cat in categories %}
+<tr class="{% cycle row1,row2 %}">
+<td>{{cat.name}}</td><td><a href="delete-category?gamename={{game.name}}&catname={{cat.name}}">DELETE CATEGORY</a></td></tr>
+{% endfor %}
+
+<form action="/user/edit-game" method="post" style="margin: 0">
+<tr class="{% cycle row1,row2 %}">
+  <td><input type="text" name="category"/></td>
+  <td><input type="hidden" name="gamename" value="{{game.name}}"><input type="hidden" name="type" value="new_category"><input type="submit" value="Add Category"></td>
+</tr></form>
+
+</table>
+</fieldset>
+</div>
+
+{#                  #}
+{# Enumerate Fields #}
+{#                  #}
+<div>
+<fieldset><legend>Score Fields</legend>
+<div><label>Help:<a href="#" onclick='$("#fields_help").toggle();return false;')>?</a></label></div>
+<div id="fields_help" class="help"><ul>
+<li><strong>Name:</strong> The name of the field. All your fields SHALL start with <i>usr_</i>. <i>cc_</i> fields are predefined fields.</li>
+<li><strong>Type:</strong> Integer, Float or String</li>
+<li><strong>Send to iPhone:</strong> Whether or not this field will be send to the iPhone. Set to <i>True</i> only if you are going to use this field on the iPhone.</li>
+<li><strong>Display On Web:</strong> Whether or not this field will be displayed on the Web site.</li>
+<li><strong>Action:</strong> <i>Delete field</i> means that the field will be deleted</li>
+Use <strong>cc_playername</strong> to store the players name/nick/etc.<br/>
+Use <strong>cc_score</strong> to store the score.<br/>
+The benefits of using <i>cc_</i> fields is that they can be queried.
+</ul></div>
+<script>$("#fields_help").hide();</script>
+
+<table class="stats" style="margin-bottom: 0">
+<tr class="head">
+<th>Name</th><th>Type</td><th>Send to iPhone</th><th>Display on Web</th><th>Action</th>
+</tr>
+
+{% for field in fields %}
+<tr class="{% cycle row1,row2 %}">
+<td>{{field.name}}</td>
+<td>{{field.type}}</td>
+<td>{{field.send}}</td>
+<td>
+{{field.displayweb}}
+<form action="/user/edit-game"  method="post" id="game_displayweb_form" onSubmit="return false;">
+<input type="hidden" name="gamename" value="{{game.name}}">
+<input type="hidden" name="fieldname" value="{{field.name}}">
+<input type="hidden" name="type" value="update_displayweb">
+<select name="displayweb" onChange="this.form.submit();">
+    {% if field.displayweb %}
+        <option selected>True</option>
+        <option>False</option>
+    {% else %}
+        <option>True</option>
+        <option selected>False</option>
+    {% endif %}
+</form>
+</td>
+<td>
+{% if field.admin %}
+{% else %}
+<a href="delete-field?gamename={{game.name}}&fieldname={{field.name}}">DELETE FIELD</a>
+{% endif %}
+</td>
+</tr>
+{% endfor %}
+
+{# Add a New Field #}
+<form name="input" action="/user/edit-game" method="post">
+<tr class="{% cycle row1,row2 %}">
+{# field name #}
+<td><input type="text" name="fieldname" value="usr_" size="20"></td>
+{# field type #}
+<td><select name="fieldtype">
+    <option>string</option>
+    <option selected>int</option>
+    <option>float</option>
+    </select></td>
+{# sendback #}
+<td>
+    <select name="sendback">
+        <option selected>True</option>
+        <option>False</option>
+    </select>
+</td>
+<td>
+    <select name="displayweb">
+        <option selected>True</option>
+        <option>False</option>
+    </select>
+</td>
+<input type="hidden" name="gamename" value="{{game.name}}">
+<input type="hidden" name="type" value="new_field">
+{# action #}
+<td><input type="submit" value="Add new field"></td>
+</tr>
+</form>
+
+</table>
+</fieldset>
+</div>
+
+{# Delete Scores#}
+<form action="/user/delete-scores" method="post" id="delete_scores_form">
+<fieldset><legend>Delete Scores</legend>
+    <div>WARNING: All the scores will be deleted. </div>
+    <div><label>Total number of scores to be deleted: {{game.nro_scores}}</label></div>
+    <input type="hidden" name="gamename" value="{{game.name}}">
+    <p><a href="#" onclick="if(confirm('DELETE ALL the scores?')) {$('#delete_scores_form').submit();}" class="button negative"><img src="/static/bt/img/icons/cross.png" />Delete Scores</a></p>
+</fieldset>
+</form>
+
+{# Delete Game #}
+<form action="/user/delete-game" method="post" id="delete_game_form">
+<fieldset><legend>WARNING: DELETE GAME</legend>
+    <div>WARNING: All the game info, including scores will be deleted</div>
+    <input type="hidden" name="gamename" value="{{game.name}}">
+    <p><a href="#" onclick="if(confirm('DELETE the game?')) {$('#delete_game_form').submit();}" class="button negative"><img src="/static/bt/img/icons/cross.png" />Delete Game</a></p>
+</fieldset>
+</form>
+
+
+
+{% endblock %}
+
+{% block sidebar %}
+{% endblock %}

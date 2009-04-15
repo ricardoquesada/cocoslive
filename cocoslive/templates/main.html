@@ -1,0 +1,37 @@
+{# cocos live (c) 2009 Ricardo Quesada #}
+{# http://www.cocoslive.net #}
+{# License: See LICENSE file #}
+{% extends "page.html" %}
+
+{% block sidebar %}
+{% endblock %}
+
+{% block content %}
+<h2 class="fancy">Latest News</h2>
+<ul>
+<li>cocos Live v0.3.0 released <small><i><b>2009-03-20</b></i></small></li>
+<li>cocos Live v0.2.0 released <small><i><b>2009-03-04</b></i></small></li>
+<li>cocos Live v0.1.3 released <small><i><b>2009-03-02</b></i></small></li>
+<li>cocos Live v0.1.2 released <small><i><b>2009-02-26</b></i></small></li>
+<li><a href="http://blog.sapusmedia.com/2009/02/cocos-live-v011-with-device-id-filter.html">cocos Live v0.1.1 with filter for Device Id</a> <small><i><b>2009-02-25</b></i></small></li>
+<li><a href="http://blog.sapusmedia.com/2009/02/cocos-live-high-score-server-for.html">cocos Live, a high score server for iPhone Games</a> <small><i><b>2009-02-19</b></i></small></li>
+</ul>
+
+<h2 class="fancy">Featured Games</h2>
+
+<table class="stats">
+<thead>
+  <tr class="head"><th>Icon</th><th>View High Scores</th><th>Total number of Scores</th></tr>
+</thead>
+<tbody>
+{% for game in games %}
+<tr class="{% cycle row1,row2 %}">
+  <td><img src="/icon/game?gamename={{game.name}}" title="{{game.name}}"></td>
+  <td><a href="game-scores?gamename={{game.name}}" title="{{game.name}} high scores">{{game.name}}</a></td>
+  <td>{{game.nro_scores}}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+
+{% endblock %}
