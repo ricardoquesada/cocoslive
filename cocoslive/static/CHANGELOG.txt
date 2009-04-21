@@ -1,4 +1,5 @@
-v0.3.1 - xx-Mar-2009
+v0.3.1 - xx-Apr-2009
+ . Updated LICENSE. GNU GPL v3
  . Post: Update score is only updated if the score is better than the previous one
  . EditGame: create cc_playername if it doesnt exists when compatibility is enabled
 
