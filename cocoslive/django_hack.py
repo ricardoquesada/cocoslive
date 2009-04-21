@@ -58,7 +58,10 @@ register.filter(getattr)
 def getfield(obj, arg):
     ret = getattr(obj,arg)
     if not ret:
-        ret = eval('obj.%s' % arg)
+        try:
+            ret = eval('obj.%s' % arg)
+        except AttributeError, e:
+            return 'N/A'
     return ret
 
 def prettyfield(obj):

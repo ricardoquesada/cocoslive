@@ -1,7 +1,9 @@
-v0.3.1 - xx-Apr-2009
- . Updated LICENSE. GNU GPL v3
- . Post: Update score is only updated if the score is better than the previous one
+v0.3.1 - 21-Apr-2009
+ . Admin: con edit the "publish" property
  . EditGame: create cc_playername if it doesnt exists when compatibility is enabled
+ . Post: Update score is only updated if the score is better than the previous one
+ . Scores: if a field is empty, display N/A
+ . Updated LICENSE. GNU GPL v3
 
 v0.3.0 - 20-Mar-2009
  . Admin: View developers who want to receive email updates
