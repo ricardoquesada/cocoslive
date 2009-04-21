@@ -85,7 +85,7 @@ class GetScores(BaseHandler):
         d = {}
         for f in fields:
             key = f.name
-            value = getattr( e, f.name )
+            value = getattr( e, f.name, '' )
             d[key] =  value
 
         d['position'] = self.position
