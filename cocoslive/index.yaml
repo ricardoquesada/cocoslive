@@ -18,7 +18,7 @@ indexes:
   - name: creationdate
     direction: desc
 
-# Unused in query history -- copied from input.
+# Used once in query history.
 - kind: Game
   properties:
   - name: owner
