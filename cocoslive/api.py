@@ -459,12 +459,12 @@ class UpdateScore(BaseHandler):
         device_id = self.request.get('cc_device_id')
         if not device_id:
             logging.error('API update-scores: No cc_device_id')
-            return None
+            raise Exception("UpdateScore failed: no cc_device_id")
 
         playername = self.request.get('cc_playername')
         if not playername:
             logging.error('API update-scores: No cc_playername')
-            return None
+            raise Exception("UpdateScore failed: no cc_playername")
 
         query = db.Query(Score)
         query.ancestor( self.game ).filter('cc_category =',category)
