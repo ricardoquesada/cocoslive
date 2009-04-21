@@ -74,6 +74,7 @@ class Game(db.Model):
     nro_scores = db.IntegerProperty( default = 0)
 
     #: Featured game
+    #: XXX: not used anymore
     featured = db.BooleanProperty( default=False, required=True)
 
     #: also copy usr_playername to cc_playername

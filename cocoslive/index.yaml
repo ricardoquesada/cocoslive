@@ -18,7 +18,7 @@ indexes:
   - name: creationdate
     direction: desc
 
-# Used once in query history.
+# Used 3 times in query history.
 - kind: Game
   properties:
   - name: owner

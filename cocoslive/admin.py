@@ -174,8 +174,8 @@ class ListDevelopers(BaseHandler):
 
         # type of POST
         type = self.request.get('type')
-        if type == 'update_featured':
-            self.update_featured( game )
+        if type == 'update_publish':
+            self.update_publish( game )
         else:
             logging.error('Type not found')
             self.error(404)
@@ -183,17 +183,17 @@ class ListDevelopers(BaseHandler):
         self.redirect('/admin/list-devs' )
 
 
-    # Updates the "Featured" property
-    def update_featured( self, game ):
+    # Updates the "publish" property
+    def update_publish( self, game ):
         # new category to game
-        new_value = self.request.get('featured_value')
+        new_value = self.request.get('publish_value')
         if not new_value:
-            logging.error('ListDevelopers: POST: missing featured_value')
+            logging.error('ListDevelopers: POST: missing publish_value')
             return
 
         new_value = (new_value == 'True')
 
-        game.featured = new_value
+        game.publish = new_value
         game.put()
  
 #
