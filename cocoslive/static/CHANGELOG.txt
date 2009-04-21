@@ -1,3 +1,6 @@
+v0.x.x: dd-mmm-2009
+ . api: update-score supports emtpy cc_playername
+
 v0.3.1 - 21-Apr-2009
  . Admin: con edit the "publish" property
  . EditGame: create cc_playername if it doesnt exists when compatibility is enabled
