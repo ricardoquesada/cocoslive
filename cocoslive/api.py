@@ -175,7 +175,7 @@ class GetScores(BaseHandler):
         '''
         if not self.validate_name():
             logging.error('API get-scores: Name validation failed')
-            return
+            raise Exception("GetScores: Name validation failed")
 
         offset = self.get_offset()
         limit = self.get_limit()
@@ -194,8 +194,8 @@ class GetScores(BaseHandler):
             if country:
                 query.filter('cc_country =', country)
             else:
-                logging.error('API get-scores: Cannot locate country for current IP')
-                return
+                logging.error('API get-scores: Cannot locate country for current IP. Game: %s' % self.game_name)
+                raise Exception("GetScores: Cannot locate country for current IP address")
 
         # device and country can't be at the same time
         elif QueryFlagByDevice & flags:
@@ -203,8 +203,8 @@ class GetScores(BaseHandler):
             if device:
                 query.filter('cc_device_id = ', device)
             else:
-                logging.error('API get-scores: Device parameter missing')
-                return
+                logging.error('API get-scores: Device parameter missing. Game: %s' % self.game_name)
+                raise Exception("GetScores: Device parameter is missing")
 
         #if dates:
         #    query.filter('cc_when >', dates)
@@ -323,12 +323,12 @@ class PostScore(BaseHandler):
         '''HTTP POST handler'''
 
         if not self.validate_name( gamename = 'cc_gamename'):
-            logging.error('Name validation failed')
-            return
+            logging.error('API post-score: Name validation failed')
+            raise Exception("PostScore: Name validation failed")
 
         if not self.validate_checksum():
-            logging.error('Checksum validation failed')
-            return
+            logging.error('API post-score: Checksum validation failed. Game: %s' % self.game_name)
+            raise Exception("PostScore: Checksum validation failed")
 
         score = Score( parent=self.game, cc_ip=self.request.remote_addr, cc_game=self.game)
 
@@ -458,12 +458,12 @@ class UpdateScore(BaseHandler):
 
         device_id = self.request.get('cc_device_id')
         if not device_id:
-            logging.error('API update-scores: No cc_device_id in game: %s' % str(self.game) )
+            logging.error('API update-score: No cc_device_id in game: %s' % self.game_name )
             raise Exception("UpdateScore failed: no cc_device_id")
 
         playername = self.request.get('cc_playername')
         if playername is None:
-            logging.error('API update-scores: No cc_playername in game: %s' % str(self.game) )
+            logging.error('API update-score: No cc_playername in game: %s' % self.game_name )
             raise Exception("UpdateScore failed: no cc_playername")
 
         query = db.Query(Score)
@@ -487,12 +487,12 @@ class UpdateScore(BaseHandler):
         '''HTTP POST handler'''
 
         if not self.validate_name( gamename = 'cc_gamename'):
-            logging.error('Name validation failed')
-            return
+            logging.error('API udpate-score: Name validation failed.')
+            raise Exception("UpdateScore: Name validation failed")
 
         if not self.validate_checksum():
-            logging.error('Checksum validation failed')
-            return
+            logging.error('API update-score: Checksum validation failed: %s' % self.game_name)
+            raise Exception("UpdateScore: Checksum failed")
 
         self.new_score = False
         score = self.get_or_create_score()
