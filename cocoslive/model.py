@@ -80,6 +80,18 @@ class Game(db.Model):
     #: also copy usr_playername to cc_playername
     use_new_playername = db.BooleanProperty( default=False, required=True )
 
+    #: supports rankings
+    ranking_enabled = db.BooleanProperty( default=False, required=False)
+
+    #: ranking: max score
+    ranking_max_score = db.IntegerProperty( default=20000, required=False)
+
+    #: ranking: max score
+    ranking_min_score = db.IntegerProperty(default=0, required=False)
+
+    #: ranking:
+    ranking_branch_factor = db.IntegerProperty(default=100, required=False)
+
     def __str__(self):
         return str( self.name )
 

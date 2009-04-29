@@ -16,6 +16,9 @@ import hashlib
 import logging
 
 # GAE imports
+from google.appengine.api import datastore
+from google.appengine.api import datastore_errors
+from google.appengine.api import datastore_types
 from google.appengine.ext import webapp
 from google.appengine.ext import db
 from google.appengine.ext.webapp.util import run_wsgi_app
@@ -24,8 +27,10 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 import simplejson as json
 
 # local imports
-from model import Game, Score, ScoreField, ScoresCountry
+from model import Game, Score, ScoreField, ScoresCountry 
 from util import *
+
+from ranker import ranker
 
 
 class BaseHandler( webapp.RequestHandler):
@@ -227,7 +232,77 @@ class GetScores(BaseHandler):
 
         # send back the info
         self.response.out.write( json.dumps( d ) )
-        
+
+
+class GetRankForScore(BaseHandler):
+    '''Handles the HTTP GET request to obtain the global ranking of name + device
+    No login is necessary
+    '''
+
+    def __init__(self):
+        super( GetRankForScore, self ).__init__()
+        self.json = []
+        self.position = 0
+
+    def get_ranker( self, game_key, category ):
+        key = datastore_types.Key.from_path("Ranking", category, parent=game_key )
+        return ranker.Ranker(datastore.Get(key)["ranker"])
+
+    def get(self):
+        '''HTTP GET request.
+        Needed arguments:
+            gamename: Name of the game. Required field
+            name: name of the player 
+            device: device id 
+        '''
+        if not self.validate_name():
+            logging.error('API get-scores: Name validation failed')
+            raise Exception("GetScores: Name validation failed")
+
+        category = self.request.get('category')
+        if category is None:
+            category = ''
+
+        score = self.request.get('score')
+        score = int(score)
+        ranker = self.get_ranker( self.game.key(), category )
+        rank = ranker.FindRank( [score] )
+        self.response.out.write('OK: %d' % rank )
+
+class GetScoreForRank(BaseHandler):
+    '''Handles the HTTP GET request to obtain the global ranking of name + device
+    No login is necessary
+    '''
+
+    def __init__(self):
+        super( GetScoreForRank, self ).__init__()
+        self.json = []
+        self.position = 0
+
+    def get_ranker( self, game_key, category ):
+        key = datastore_types.Key.from_path("Ranking", category, parent=game_key )
+        return ranker.Ranker(datastore.Get(key)["ranker"])
+
+    def get(self):
+        '''HTTP GET request.
+        Needed arguments:
+            gamename: Name of the game. Required field
+            name: name of the player 
+            device: device id 
+        '''
+        if not self.validate_name():
+            logging.error('API get-scores: Name validation failed')
+            raise Exception("GetScores: Name validation failed")
+
+        category = self.request.get('category')
+        if category is None:
+            category = ''
+
+        rank = self.request.get('rank')
+        rank = int(rank)
+        ranker = self.get_ranker( self.game.key(), category )
+        score = ranker.FindScore( rank )
+        self.response.out.write('OK: %d %d' % (score[0][0], score[1]) )
 #
 # 'score/post' handler
 #
@@ -456,6 +531,8 @@ class UpdateScore(BaseHandler):
         if not category:
             category = ''
 
+        self.category = category
+
         device_id = self.request.get('cc_device_id')
         if not device_id:
             logging.error('API update-score: No cc_device_id in game: %s' % self.game_name )
@@ -465,6 +542,9 @@ class UpdateScore(BaseHandler):
         if playername is None:
             logging.error('API update-score: No cc_playername in game: %s' % self.game_name )
             raise Exception("UpdateScore failed: no cc_playername")
+
+        # needed for rankings
+        self.profile_id = "%s@%s" % (playername, device_id)
 
         query = db.Query(Score)
         query.ancestor( self.game ).filter('cc_category =',category)
@@ -516,15 +596,34 @@ class UpdateScore(BaseHandler):
       
         if self.new_score or (desc_score and score.cc_score > old_score) or (not desc_score and score.cc_score < old_score):
             score_country = self.get_or_create_country( country )
+
             db.run_in_transaction( self.update_score,  score, score_country )
+
+            if self.game.ranking_enabled:
+                r = self.get_ranker()
+                r.SetScore( self.profile_id, [score.cc_score])
+                
 
         # answer OK
         self.response.out.write('OK')
 
+    def get_ranker( self ):
+        key = datastore_types.Key.from_path("Ranking", self.category, parent=self.game.key() )
+        try:
+            return ranker.Ranker(datastore.Get(key)["ranker"])
+        except datastore_errors.EntityNotFoundError:
+            r = ranker.Ranker.Create([self.game.ranking_min_score, self.game.ranking_max_score], self.game.ranking_branch_factor)
+            app = datastore.Entity("Ranking", name=self.category, parent=self.game.key() )
+            app["ranker"] = r.rootkey
+            datastore.Put(app)
+            return r
+
 application = webapp.WSGIApplication([
         ('/api/post-score', PostScore),
-        ('/api/get-scores', GetScores),
         ('/api/update-score', UpdateScore),
+        ('/api/get-scores', GetScores),
+        ('/api/get-rank-for-score', GetRankForScore),
+        ('/api/get-score-for-rank', GetScoreForRank),
         ],
         debug=True)
 
