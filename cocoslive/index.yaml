@@ -51,7 +51,7 @@ indexes:
   - name: cc_country
   - name: cc_score
 
-# Unused in query history -- copied from input.
+# Used once in query history.
 - kind: Score
   ancestor: yes
   properties:
@@ -87,7 +87,7 @@ indexes:
   - name: cc_device_id
   - name: cc_score
 
-# Unused in query history -- copied from input.
+# Used once in query history.
 - kind: Score
   ancestor: yes
   properties:
@@ -104,7 +104,7 @@ indexes:
   - name: cc_game
   - name: cc_score
 
-# Used 12 times in query history.
+# Used 13 times in query history.
 - kind: Score
   ancestor: yes
   properties:
@@ -120,7 +120,7 @@ indexes:
   - name: cc_category
   - name: cc_score
 
-# Used 15 times in query history.
+# Used 23 times in query history.
 - kind: Score
   ancestor: yes
   properties:

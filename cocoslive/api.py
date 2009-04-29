@@ -269,6 +269,43 @@ class GetRankForScore(BaseHandler):
         rank = ranker.FindRank( [score] )
         self.response.out.write('OK: %d' % rank )
 
+class GetRanksForScores(BaseHandler):
+    '''Handles the HTTP GET request to obtain the global ranking of name + device
+    No login is necessary
+    '''
+
+    def __init__(self):
+        super( GetRanksForScores, self ).__init__()
+        self.json = []
+        self.position = 0
+
+    def get_ranker( self, game_key, category ):
+        key = datastore_types.Key.from_path("Ranking", category, parent=game_key )
+        return ranker.Ranker(datastore.Get(key)["ranker"])
+
+    def get(self):
+        '''HTTP GET request.
+        Needed arguments:
+            gamename: Name of the game. Required field
+            name: name of the player 
+            device: device id 
+        '''
+        if not self.validate_name():
+            logging.error('API get-scores: Name validation failed')
+            raise Exception("GetScores: Name validation failed")
+
+        category = self.request.get('category')
+        if category is None:
+            category = ''
+
+        scores = self.request.get('scores')
+        scores = scores.split(',')
+        scores = map(lambda y: [int(y)], scores)
+        ranker = self.get_ranker( self.game.key(), category )
+        ranks = ranker.FindRanks( scores )
+        ranks = map(int, ranks)
+        self.response.out.write('OK: %s' % str(ranks) )
+
 class GetScoreForRank(BaseHandler):
     '''Handles the HTTP GET request to obtain the global ranking of name + device
     No login is necessary
@@ -623,6 +660,7 @@ application = webapp.WSGIApplication([
         ('/api/update-score', UpdateScore),
         ('/api/get-scores', GetScores),
         ('/api/get-rank-for-score', GetRankForScore),
+        ('/api/get-ranks-for-scores', GetRanksForScores),
         ('/api/get-score-for-rank', GetScoreForRank),
         ],
         debug=True)
