@@ -2,6 +2,7 @@ v0.x.x: dd-mmm-2009
  . API: Rankings (experimental) added
  . API: update-score supports emtpy cc_playername
  . API: Raise error in abnormal situatino. Log the game name
+ . Web: Display Scores: supports Rankings
 
 v0.3.1 - 21-Apr-2009
  . Admin: con edit the "publish" property

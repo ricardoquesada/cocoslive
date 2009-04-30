@@ -128,7 +128,8 @@
 {# table score data #}
 {% for score in scores %}
 <tr class="{% cycle row1,row2 %}">
-<td>{{ forloop.counter|add:offset }}</td>
+{# <td>{{ forloop.counter|add:offset }}</td> #}
+<td>{{ score.position }}</td>
 {% for field in fields %}
     {% if field.displayweb%}
         {% ifequal field.name "cc_country" %}

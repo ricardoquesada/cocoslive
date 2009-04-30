@@ -25,11 +25,15 @@ from google.appengine.ext.webapp import template
 from google.appengine.api import users
 from google.appengine.ext import db
 from google.appengine.api import images
+from google.appengine.api import datastore
+from google.appengine.api import datastore_errors
+from google.appengine.api import datastore_types
 
 # local imports
 from model import *
 from util import *
 import configuration
+from ranker import ranker
 
 
 class BaseHandler( webapp.RequestHandler):
@@ -99,6 +103,10 @@ class BaseHandler( webapp.RequestHandler):
         """
         params = { 'error_message' : error_message }
         return self.respond('404', params )
+
+    def get_ranker( self, game_key, category ):
+        key = datastore_types.Key.from_path("Ranking", category, parent=game_key )
+        return ranker.Ranker(datastore.Get(key)["ranker"])
 #
 # '/' handler
 #
@@ -175,6 +183,16 @@ class GameScores(BaseHandler):
         if deviceid:
             query.filter('cc_device_id =',deviceid)
         scores = query.fetch(limit=limit, offset=offset)
+
+        if game.ranking_enabled:
+            ranker = self.get_ranker( game.key(), category )
+            s = map( lambda y: [y.cc_score], scores)
+            ranks = ranker.FindRanks( s )
+            for i,item in enumerate(scores):
+                item.position = ranks[i]+1
+        else:
+            for i,item in enumerate(scores):
+                item.position = offset + i + 1
 
         fields = game.score_fields
 
