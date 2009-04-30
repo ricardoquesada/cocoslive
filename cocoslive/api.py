@@ -134,7 +134,10 @@ class GetScores(BaseHandler):
             limit = int(limit)
 
         if limit > 100:
-            limit = 100
+            raise Exception("GetScores: limit can't be greater than 100")
+
+        if self.game.ranking_enabled and limit > 40:
+            raise Exception("GetScores: limit can't be greater than 40 when rankings are enabled")
 
         return limit
 
@@ -185,6 +188,16 @@ class GetScores(BaseHandler):
     def get_device_id(self):
         '''Get the device ID'''
         return self.request.get('device')
+
+    def update_json_with_positions( self, ranker ):
+        scores = map(lambda y: [y['cc_score']], self.json )
+        ranks = ranker.FindRanks( scores )
+
+        # is it needed to convert longs to int ?
+        ranks = map(int, ranks)
+
+        for i,item in enumerate(self.json):
+            item['position'] = ranks[i]
 
     def get(self):
         '''HTTP GET request.
@@ -244,6 +257,10 @@ class GetScores(BaseHandler):
         for r in results:
             self.entity_to_json(r, fields)
 
+        if self.game.ranking_enabled:
+            ranker = self.get_ranker( self.game.key(), category )
+            self.update_json_with_positions( ranker )
+
         # to comply with JSON parser in objective-c
         # a dictionary shall be the first element
         d = { 'scores' : self.json }
@@ -270,8 +287,12 @@ class GetRankForScore(BaseHandler):
             device: device id 
         '''
         if not self.validate_name():
-            logging.error('API get-scores: Name validation failed')
-            raise Exception("GetScores: Name validation failed")
+            logging.error('API get-rank-for-score: Name validation failed')
+            raise Exception("GetRankForScore: Name validation failed")
+
+        if not self.game.ranking_enabled:
+            logging.error('API get-rank-for-score: game does not support ranking')
+            raise Exception("GetRankForScore: game does not support ranking")
 
         category = self.request.get('category')
         if category is None:
@@ -301,8 +322,12 @@ class GetRanksForScores(BaseHandler):
             device: device id 
         '''
         if not self.validate_name():
-            logging.error('API get-scores: Name validation failed')
-            raise Exception("GetScores: Name validation failed")
+            logging.error('API get-ranks-for-score: Name validation failed')
+            raise Exception("GetRanksForScores: Name validation failed")
+
+        if not self.game.ranking_enabled:
+            logging.error('API get-ranks-for-scores: game does not support ranking')
+            raise Exception("GetRanksForScores: game does not support ranking")
 
         category = self.request.get('category')
         if category is None:
@@ -334,8 +359,12 @@ class GetScoreForRank(BaseHandler):
             device: device id 
         '''
         if not self.validate_name():
-            logging.error('API get-scores: Name validation failed')
-            raise Exception("GetScores: Name validation failed")
+            logging.error('API get-score-for-rank: Name validation failed')
+            raise Exception("GetScoreForRank: Name validation failed")
+
+        if not self.game.ranking_enabled:
+            logging.error('API get-score-for-rank: game does not support ranking')
+            raise Exception("GetScoreForRank: game does not support ranking")
 
         category = self.request.get('category')
         if category is None:
@@ -444,6 +473,11 @@ class PostScore(BaseHandler):
         if not self.validate_name( gamename = 'cc_gamename'):
             logging.error('API post-score: Name validation failed')
             raise Exception("PostScore: Name validation failed")
+
+        if self.game.ranking_enabled:
+            logging.error('API post-score: Ranking support is not enabled with "new score" yet')
+            raise Exception("PostScore: Ranking support is not enabled with 'new score' yet")
+
 
         if not self.validate_checksum():
             logging.error('API post-score: Checksum validation failed. Game: %s' % self.game_name)
