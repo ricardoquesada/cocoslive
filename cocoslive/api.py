@@ -193,11 +193,9 @@ class GetScores(BaseHandler):
         scores = map(lambda y: [y['cc_score']], self.json )
         ranks = ranker.FindRanks( scores )
 
-        # is it needed to convert longs to int ?
-        ranks = map(int, ranks)
-
         for i,item in enumerate(self.json):
-            item['position'] = ranks[i]
+            # ranker are 0-based. Make it 1-based
+            item['position'] = ranks[i] + 1
 
     def get(self):
         '''HTTP GET request.
@@ -302,7 +300,7 @@ class GetRankForScore(BaseHandler):
         score = int(score)
         ranker = self.get_ranker( self.game.key(), category )
         rank = ranker.FindRank( [score] )
-        self.response.out.write('OK: %d' % rank )
+        self.response.out.write('OK: %d' % (rank + 1) )
 
 class GetRanksForScores(BaseHandler):
     '''Handles the HTTP GET request to obtain the global ranking of name + device
@@ -338,7 +336,7 @@ class GetRanksForScores(BaseHandler):
         scores = map(lambda y: [int(y)], scores)
         ranker = self.get_ranker( self.game.key(), category )
         ranks = ranker.FindRanks( scores )
-        ranks = map(int, ranks)
+        ranks = map(lambda y:int(y)+1, ranks)
         self.response.out.write('OK: %s' % str(ranks) )
 
 class GetScoreForRank(BaseHandler):
