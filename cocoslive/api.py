@@ -22,6 +22,7 @@ from google.appengine.api import datastore_types
 from google.appengine.ext import webapp
 from google.appengine.ext import db
 from google.appengine.ext.webapp.util import run_wsgi_app
+from ranker.common import transactional
 
 # 3rd partly libs
 import simplejson as json
@@ -39,6 +40,23 @@ class BaseHandler( webapp.RequestHandler):
         super( BaseHandler, self ).__init__()
         self.game = None
         self.game_name = ''
+
+    def get_ranker( self, game_key, category ):
+        key = datastore_types.Key.from_path("Ranking", category, parent=game_key )
+        return ranker.Ranker(datastore.Get(key)["ranker"])
+
+    def get_or_create_ranker( self, game_key, category ):
+        key = datastore_types.Key.from_path("Ranking", category, parent=game_key )
+        try:
+            return ranker.Ranker(datastore.Get(key)["ranker"])
+        except datastore_errors.EntityNotFoundError:
+            r = ranker.Ranker.Create([self.game.ranking_min_score, self.game.ranking_max_score], self.game.ranking_branch_factor)
+            app = datastore.Entity("Ranking", name=category, parent=game_key )
+            app["ranker"] = r.rootkey
+            datastore.Put(app)
+            return r
+
+
 
     def validate_name(self, gamename ='gamename'):
         '''validate authentication
@@ -244,10 +262,6 @@ class GetRankForScore(BaseHandler):
         self.json = []
         self.position = 0
 
-    def get_ranker( self, game_key, category ):
-        key = datastore_types.Key.from_path("Ranking", category, parent=game_key )
-        return ranker.Ranker(datastore.Get(key)["ranker"])
-
     def get(self):
         '''HTTP GET request.
         Needed arguments:
@@ -278,10 +292,6 @@ class GetRanksForScores(BaseHandler):
         super( GetRanksForScores, self ).__init__()
         self.json = []
         self.position = 0
-
-    def get_ranker( self, game_key, category ):
-        key = datastore_types.Key.from_path("Ranking", category, parent=game_key )
-        return ranker.Ranker(datastore.Get(key)["ranker"])
 
     def get(self):
         '''HTTP GET request.
@@ -315,10 +325,6 @@ class GetScoreForRank(BaseHandler):
         super( GetScoreForRank, self ).__init__()
         self.json = []
         self.position = 0
-
-    def get_ranker( self, game_key, category ):
-        key = datastore_types.Key.from_path("Ranking", category, parent=game_key )
-        return ranker.Ranker(datastore.Get(key)["ranker"])
 
     def get(self):
         '''HTTP GET request.
@@ -416,6 +422,7 @@ class PostScore(BaseHandler):
 
     # This methods is run inside a transaction
     # All updates shall be done in the 'self.game' context
+    @transactional
     def post_score( self, score, score_country ):
 
         # save score
@@ -468,7 +475,8 @@ class PostScore(BaseHandler):
 
         score_country = self.get_or_create_country( country )
 
-        db.run_in_transaction( self.post_score,  score, score_country )
+        # runs in trasaction
+        self.post_score( score, score_country )
 
         # answer OK
         self.response.out.write('OK')
@@ -549,6 +557,7 @@ class UpdateScore(BaseHandler):
 
     # This methods is run inside a transaction
     # All updates shall be done in the 'self.game' context
+    @transactional
     def update_score( self, score, score_country ):
 
         # save score
@@ -560,6 +569,7 @@ class UpdateScore(BaseHandler):
 
             # update scores by country
             self.update_scores_by_country( score_country )
+
 
     # Get or create score
     # XXX: possible (but improbable) race condition
@@ -634,26 +644,15 @@ class UpdateScore(BaseHandler):
         if self.new_score or (desc_score and score.cc_score > old_score) or (not desc_score and score.cc_score < old_score):
             score_country = self.get_or_create_country( country )
 
-            db.run_in_transaction( self.update_score,  score, score_country )
+            # runs in transaction
+            self.update_score( score, score_country )
 
             if self.game.ranking_enabled:
-                r = self.get_ranker()
-                r.SetScore( self.profile_id, [score.cc_score])
-                
+                ranker = self.get_or_create_ranker( self.game.key(), self.category )
+                ranker.SetScore( self.profile_id, [score.cc_score])
 
         # answer OK
         self.response.out.write('OK')
-
-    def get_ranker( self ):
-        key = datastore_types.Key.from_path("Ranking", self.category, parent=self.game.key() )
-        try:
-            return ranker.Ranker(datastore.Get(key)["ranker"])
-        except datastore_errors.EntityNotFoundError:
-            r = ranker.Ranker.Create([self.game.ranking_min_score, self.game.ranking_max_score], self.game.ranking_branch_factor)
-            app = datastore.Entity("Ranking", name=self.category, parent=self.game.key() )
-            app["ranker"] = r.rootkey
-            datastore.Put(app)
-            return r
 
 application = webapp.WSGIApplication([
         ('/api/post-score', PostScore),
