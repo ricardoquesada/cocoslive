@@ -672,19 +672,28 @@ class UpdateScore(BaseHandler):
                 value = self.request.get(arg)
                 casted_value = self.cast_value_to_type( arg, value )
                 setattr( score, arg, casted_value )
-      
+     
+        score_updated = False
         if self.new_score or (desc_score and score.cc_score > old_score) or (not desc_score and score.cc_score < old_score):
             score_country = self.get_or_create_country( country )
 
             # runs in transaction
             self.update_score( score, score_country )
+            score_updated = True
 
             if self.game.ranking_enabled:
+                # BUG XXX should run in another transaction
                 ranker = self.get_or_create_ranker( self.game.key(), self.category )
                 ranker.SetScore( self.profile_id, [score.cc_score])
 
-        # answer OK
-        self.response.out.write('OK')
+
+        if self.game.ranking_enabled:
+            ranker = self.get_ranker( self.game.key(), self.category )
+            rank = ranker.FindRank( [score.cc_score] )
+            self.response.out.write('OK:ranking=%d,score_updated=%d' % (rank+1, score_updated) )
+        else:
+            self.response.out.write('OK')
+
 
 application = webapp.WSGIApplication([
         ('/api/post-score', PostScore),
