@@ -107,6 +107,17 @@ class BaseHandler( webapp.RequestHandler):
     def get_ranker( self, game_key, category ):
         key = datastore_types.Key.from_path("Ranking", category, parent=game_key )
         return ranker.Ranker(datastore.Get(key)["ranker"])
+
+    def get_or_create_ranker( self, game_key, category ):
+        key = datastore_types.Key.from_path("Ranking", category, parent=game_key )
+        try:
+            return ranker.Ranker(datastore.Get(key)["ranker"])
+        except datastore_errors.EntityNotFoundError:
+            r = ranker.Ranker.Create([self.game.ranking_min_score, self.game.ranking_max_score], self.game.ranking_branch_factor)
+            app = datastore.Entity("Ranking", name=category, parent=game_key )
+            app["ranker"] = r.rootkey
+            datastore.Put(app)
+            return r
 #
 # '/' handler
 #
@@ -185,7 +196,8 @@ class GameScores(BaseHandler):
         scores = query.fetch(limit=limit, offset=offset)
 
         if game.ranking_enabled:
-            ranker = self.get_ranker( game.key(), category )
+            self.game = game        # needed for get_or_create_ranker
+            ranker = self.get_or_create_ranker( game.key(), category )
             s = map( lambda y: [y.cc_score], scores)
             ranks = ranker.FindRanks( s )
             for i,item in enumerate(scores):

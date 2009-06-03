@@ -39,6 +39,7 @@ import simplejson as json
 from model import Developer, Game, Score, ScoreField, Category, ScoresCountry
 from util import *
 import configuration
+from ranker.common import transactional
 
 def owner_of_game_required(func):
     """Ensure that the logged in user is the owner of the game."""
@@ -782,17 +783,22 @@ class EditScores(BaseHandler):
         score_country = query.fetch(limit=1)[0]
 
         if score:
-            db.run_in_transaction( self.delete_score_tran, score, game, score_country )
+            self.delete_score( score, game, score_country )
         else:
             logging.error('EditScores: Score not not found')
             self.response.out.write('EditScores: Score not found')
 
-    def delete_score_tran( self, score, game, score_country ):
+    # 
+    # delete score, runs in trasaction
+    #
+    @transactional
+    def delete_score( self, score, game, score_country ):
         score.delete()
         score_country.quantity -= 1
         score_country.put()
         game.nro_scores -=1 
         game.put()
+        #ranker.SetScore(name, None)
 
 #
 # Delete Category from Game
