@@ -39,6 +39,7 @@ import simplejson as json
 from model import Developer, Game, Score, ScoreField, Category, ScoresCountry
 from util import *
 import configuration
+from ranker import ranker
 from ranker.common import transactional
 
 def owner_of_game_required(func):
@@ -166,6 +167,21 @@ class BaseHandler( webapp.RequestHandler):
             dev.put()
         else:
             pass
+
+    def get_ranker( self, game_key, category ):
+        key = datastore_types.Key.from_path("Ranking", category, parent=game_key )
+        return ranker.Ranker(datastore.Get(key)["ranker"])
+
+    def get_or_create_ranker( self, game_key, category ):
+        key = datastore_types.Key.from_path("Ranking", category, parent=game_key )
+        try:
+            return ranker.Ranker(datastore.Get(key)["ranker"])
+        except datastore_errors.EntityNotFoundError:
+            r = ranker.Ranker.Create([self.game.ranking_min_score, self.game.ranking_max_score], self.game.ranking_branch_factor)
+            app = datastore.Entity("Ranking", name=category, parent=game_key )
+            app["ranker"] = r.rootkey
+            datastore.Put(app)
+            return r
 #
 # '/create-user' handler
 #
@@ -661,6 +677,11 @@ class DeleteScores(BaseHandler):
         name = self.request.get('gamename')
         game = Game.get_by_key_name( name )
 
+        if game.ranking_enabled:
+            logging.error('DeleteScores: Cant delete scores when rankings are enabled')
+            self.response.out.write('DeleteScores: Cant delete score when rankings are enabled')
+            return
+
         for s in game.scores:
             s.delete()
 
@@ -783,16 +804,18 @@ class EditScores(BaseHandler):
         score_country = query.fetch(limit=1)[0]
 
         if score:
-            self.delete_score( score, game, score_country )
+            if game.ranking_enabled:
+                raise Exception('EditScores: Cant delete scores when rankings are enabled')
+            else:
+                self.delete_score_transac( score, game, score_country )
         else:
-            logging.error('EditScores: Score not not found')
-            self.response.out.write('EditScores: Score not found')
+            raise Exception('EditScores: Score not not found')
 
     # 
     # delete score, runs in trasaction
     #
     @transactional
-    def delete_score( self, score, game, score_country ):
+    def delete_score_transac( self, score, game, score_country ):
         score.delete()
         score_country.quantity -= 1
         score_country.put()
