@@ -1,4 +1,5 @@
-v0.3.2: dd-May-2009
+v0.3.2: dd-Jun-2009
+ . API: Can't delete scores when rankings are enabled
  . API: Rankings (experimental) added
  . API: update-score supports emtpy cc_playername
  . API: Raise error in abnormal situatino. Log the game name
