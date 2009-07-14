@@ -1,0 +1,45 @@
+{# cocos live #}
+{# http://www.cocoslive.net #}
+{# License: See LICENSE file #}
+{% extends "page.html" %}
+
+{% block sidebar %}
+{% endblock %}
+
+{% block content %}
+
+<div>
+<table class="stats">
+<thead>
+    <tr>
+        <th>Icon</th><th>Ready</th><th>Scores</th><th>Game Name</td><th>Owner</th><th>Creation Date</th>
+    </tr>
+</thead>
+
+<tbody>
+{% for game in games %}
+<tr>
+<td><img src="/icon/game?gamename={{game.name}}" title="{{game.name}}"></td>
+<td>{{ game.publish }}
+<form action="/admin/list-devs"  method="post" onSubmit="return false;">
+<input type="hidden" name="gamename" value="{{game.name}}">
+<input type="hidden" name="type" value="update_publish">
+<select name="publish_value" onChange="this.form.submit();">
+    {% if game.publish %}
+        <option selected>True</option>
+        <option>False</option>
+    {% else %}
+        <option>True</option>
+        <option selected>False</option>
+    {% endif %}
+</form>
+</td>
+<td>{{ game.nro_scores}}</td>
+<td><a href="/game-scores?gamename={{ game.name }}">{{game.name}}</a></td><td>{{game.owner}}</td>
+<td>{{ game.creationdate|date:"d-M-y" }}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+{% endblock %}

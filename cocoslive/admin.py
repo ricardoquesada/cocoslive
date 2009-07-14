@@ -138,21 +138,19 @@ class AdminHandler(BaseHandler):
 
 # 
 #
-# '/admin/list-devs' handler
+# '/admin/list-games' handler
 #
-class ListDevelopers(BaseHandler):
+class ListGames(BaseHandler):
 
     @admin_required
     def get(self):
         games = Game.all().order('-creationdate')
-        devs = Developer.all().order('-creationdate')
 
         params = {
-            'devs' : devs,
             'games' : games,
-            'page' : {'title' : 'Developers and Games'},
+            'page' : {'title' : 'Games'},
         }
-        self.respond('admin-devs', params)
+        self.respond('admin-games', params)
 
 
     @admin_required
@@ -195,6 +193,23 @@ class ListDevelopers(BaseHandler):
 
         game.publish = new_value
         game.put()
+# 
+#
+# '/admin/list-devs' handler
+#
+class ListDevelopers(BaseHandler):
+
+    @admin_required
+    def get(self):
+        devs = Developer.all().order('-creationdate')
+
+        params = {
+            'devs' : devs,
+            'page' : {'title' : 'Developers'},
+        }
+        self.respond('admin-devs', params)
+
+
  
 #
 # '/admin/list-devs-updates' handler
@@ -210,7 +225,6 @@ class ListDevelopersUpdates(BaseHandler):
             'page' : {'title' : 'Developers with Updates'},
         }
         self.respond('admin-devs-updates', params)
-
 
 #
 # '/admin/default-values' handler
@@ -275,6 +289,7 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 
 application = webapp.WSGIApplication([
         ('/admin/list-devs', ListDevelopers),
+        ('/admin/list-games', ListGames),
         ('/admin/default-values', Defaults),
         ('/admin/list-devs-updates', ListDevelopersUpdates),
         ('/admin/', AdminHandler),
