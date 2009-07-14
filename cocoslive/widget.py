@@ -85,9 +85,13 @@ class GetScores(BaseHandler):
         '''Converts an entity to JSON format'''
         d = {}
         for f in fields:
-            key = f.name
-            value = getattr( e, f.name )
-            d[key] =  value
+            try:
+                key = f.name
+                value = getattr( e, f.name )
+                d[key] =  value
+            except AttributeError, e:
+                # field not found. probably usr_playername was not found
+                pass
 
         d['position'] = self.position
         self.json.append( d )
