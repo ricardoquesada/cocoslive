@@ -272,6 +272,7 @@ class CreateGame(BaseHandler):
 
         game.put()
 
+        self.add_default_category( game )
         self.create_game_table( name, game, score_type )
         self.redirect('/user/edit-game?gamename=%s'% name)
 
@@ -284,6 +285,11 @@ class CreateGame(BaseHandler):
         if g:
             return False
         return True
+
+    def add_default_category( self, game ):
+        cat = "Classic"
+        category = Category( key_name=cat, name=cat, parent=game, game=game)
+        category.put()
 
     def create_game_table( self, name, game, score_type):
         # device id
