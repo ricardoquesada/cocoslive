@@ -684,8 +684,13 @@ class UpdateScore(BaseHandler):
             if self.game.ranking_enabled:
                 # BUG XXX should run in another transaction
                 ranker = self.get_or_create_ranker( self.game.key(), self.category )
-                ranker.SetScore( self.profile_id, [score.cc_score])
-
+                r = ranker.score_range
+                if r[0] <= score.cc_score < r[1]:
+                    ranker.SetScore( self.profile_id, [score.cc_score])
+                else:
+                    logging.error('API update-score: score outside ranking range')
+                    self.response.out.write('ERROR: score outside ranking range')
+                    return
 
         if self.game.ranking_enabled:
             ranker = self.get_ranker( self.game.key(), self.category )

@@ -1,7 +1,9 @@
 v0.3.3: 14-Jul-2009
  . API: Possibility to delete scores when rankings are enabled
+ . API: check the score range before updating it
  . Admin: Easier to list games and developers
  . Examples: updated examples. Don't use usr_playername. Instead use cc_playername
+ . EditGame: new games has a default category
 
 v0.3.2: dd-Jun-2009
  . API: Can't delete scores when rankings are enabled
