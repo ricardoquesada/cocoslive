@@ -1,3 +1,6 @@
+v0.3.3: 14-Jul-2009
+ . API: Possibility to delete scores when rankings are enabled
+
 v0.3.2: dd-Jun-2009
  . API: Can't delete scores when rankings are enabled
  . API: Rankings (experimental) added
