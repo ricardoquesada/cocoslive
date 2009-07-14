@@ -22,7 +22,7 @@ import datetime
 
 # This HTML block will be printed in the footer of every page.
 FOOTER_HTML = (
-    'cocos Live v0.3.1 - &copy; 2009 <a href="http://www.sapusmedia.com">Sapus Media</a>'
+    'cocos Live v0.3.3 - &copy; 2009 <a href="http://www.sapusmedia.com">Sapus Media</a>'
     )
 
 
