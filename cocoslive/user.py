@@ -25,6 +25,9 @@ import logging
 import functools
 
 # GAE imports
+from google.appengine.api import datastore
+from google.appengine.api import datastore_errors
+from google.appengine.api import datastore_types
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import login_required
 from google.appengine.ext.webapp import template
@@ -805,9 +808,13 @@ class EditScores(BaseHandler):
 
         if score:
             if game.ranking_enabled:
-                raise Exception('EditScores: Cant delete scores when rankings are enabled')
-            else:
-                self.delete_score_transac( score, game, score_country )
+                #NOTE: this is the implementation to get profile ID in api.py
+                profile_id = "%s@%s" % (score.cc_playername, score.cc_device_id)
+                ranker = self.get_ranker( game.key(), score.cc_category )
+                ranker.SetScore( profile_id, None )
+
+            self.delete_score_transac( score, game, score_country ) #Delete score from DB after score is deleted from Ranker
+
         else:
             raise Exception('EditScores: Score not not found')
 

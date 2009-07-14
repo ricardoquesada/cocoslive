@@ -171,6 +171,7 @@ class GameScores(BaseHandler):
                 category = game.categories[0].name
             else:
                 category = ''
+        
 
         country = self.request.get('country')
         if not country or country=='world':
