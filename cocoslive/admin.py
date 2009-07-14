@@ -138,6 +138,63 @@ class AdminHandler(BaseHandler):
 
 # 
 #
+# '/admin/list-games-ready' handler
+#
+class ListGamesReady(BaseHandler):
+
+    @admin_required
+    def get(self):
+        games = Game.all().filter('publish =',True)
+
+        params = {
+            'games' : games,
+            'page' : {'title' : 'Games'},
+        }
+        self.respond('admin-games-ready', params)
+
+
+    @admin_required
+    def post(self):
+        '''HTTP POST handler'''
+
+
+        # obtain game name
+        gamename = self.request.get('gamename')
+        if not gamename:
+            logging.error('Gamename not found')
+            return
+
+        # game belongs to developer ?
+        game = Game.all().filter( 'name =', gamename ).fetch(limit = 1)[0]
+        if not game:
+            logging.error('Game not found')
+            return 
+
+        # type of POST
+        type = self.request.get('type')
+        if type == 'update_publish':
+            self.update_publish( game )
+        else:
+            logging.error('Type not found')
+            self.error(404)
+
+        self.redirect('/admin/list-games-ready' )
+
+
+    # Updates the "publish" property
+    def update_publish( self, game ):
+        # new category to game
+        new_value = self.request.get('publish_value')
+        if not new_value:
+            logging.error('ListDevelopers: POST: missing publish_value')
+            return
+
+        new_value = (new_value == 'True')
+
+        game.publish = new_value
+        game.put()
+# 
+#
 # '/admin/list-games' handler
 #
 class ListGames(BaseHandler):
@@ -178,7 +235,7 @@ class ListGames(BaseHandler):
             logging.error('Type not found')
             self.error(404)
 
-        self.redirect('/admin/list-devs' )
+        self.redirect('/admin/list-games' )
 
 
     # Updates the "publish" property
@@ -290,6 +347,7 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 application = webapp.WSGIApplication([
         ('/admin/list-devs', ListDevelopers),
         ('/admin/list-games', ListGames),
+        ('/admin/list-games-ready', ListGamesReady),
         ('/admin/default-values', Defaults),
         ('/admin/list-devs-updates', ListDevelopersUpdates),
         ('/admin/', AdminHandler),

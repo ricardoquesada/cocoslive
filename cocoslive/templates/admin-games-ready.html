@@ -12,15 +12,16 @@
 <table class="stats">
 <thead>
     <tr>
-        <th>Ready</th><th>Scores</th><th>Game Name</td><th>Owner</th><th>Creation Date</th>
+        <th>Icon</th><th>Ready</th><th>Scores</th><th>Game Name</td><th>Owner</th><th>Creation Date</th>
     </tr>
 </thead>
 
 <tbody>
 {% for game in games %}
 <tr>
+<td><img src="/icon/game?gamename={{game.name}}" title="{{game.name}}"></td>
 <td>{{ game.publish }}
-<form action="/admin/list-games"  method="post" onSubmit="return false;">
+<form action="/admin/list-games-ready"  method="post" onSubmit="return false;">
 <input type="hidden" name="gamename" value="{{game.name}}">
 <input type="hidden" name="type" value="update_publish">
 <select name="publish_value" onChange="this.form.submit();">
