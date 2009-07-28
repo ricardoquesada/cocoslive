@@ -144,6 +144,7 @@ class ListGamesReady(BaseHandler):
 
     @admin_required
     def get(self):
+#        games = Game.all().filter('publish =',True).order('-creationdate')
         games = Game.all().filter('publish =',True)
 
         params = {
@@ -195,13 +196,14 @@ class ListGamesReady(BaseHandler):
         game.put()
 # 
 #
-# '/admin/list-games' handler
+# '/admin/list-games-not-ready' handler
 #
-class ListGames(BaseHandler):
+class ListGamesNotReady(BaseHandler):
 
     @admin_required
     def get(self):
-        games = Game.all().order('-creationdate')
+#        games = Game.all().filter('publish =',False).order('-creationdate')
+        games = Game.all().filter('publish =',False)
 
         params = {
             'games' : games,
@@ -346,7 +348,7 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 
 application = webapp.WSGIApplication([
         ('/admin/list-devs', ListDevelopers),
-        ('/admin/list-games', ListGames),
+        ('/admin/list-games-not-ready', ListGamesNotReady),
         ('/admin/list-games-ready', ListGamesReady),
         ('/admin/default-values', Defaults),
         ('/admin/list-devs-updates', ListDevelopersUpdates),
