@@ -1,3 +1,6 @@
+v0.3.4: 
+ . Admin: Option to display games that are not ready
+
 v0.3.3: 14-Jul-2009
  . API: Possibility to delete scores when rankings are enabled
  . API: check the score range before updating it
