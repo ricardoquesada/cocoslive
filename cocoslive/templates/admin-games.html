@@ -20,7 +20,7 @@
 {% for game in games %}
 <tr>
 <td>{{ game.publish }}
-<form action="/admin/list-games"  method="post" onSubmit="return false;">
+<form action="/admin/list-games-not-ready"  method="post" onSubmit="return false;">
 <input type="hidden" name="gamename" value="{{game.name}}">
 <input type="hidden" name="type" value="update_publish">
 <select name="publish_value" onChange="this.form.submit();">
