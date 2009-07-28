@@ -237,7 +237,7 @@ class ListGamesNotReady(BaseHandler):
             logging.error('Type not found')
             self.error(404)
 
-        self.redirect('/admin/list-games' )
+        self.redirect('/admin/list-games-not-ready' )
 
 
     # Updates the "publish" property
