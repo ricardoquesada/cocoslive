@@ -200,9 +200,14 @@ class GameScores(BaseHandler):
             self.game = game        # needed for get_or_create_ranker
             ranker = self.get_or_create_ranker( game.key(), category )
             s = map( lambda y: [y.cc_score], scores)
-            ranks = ranker.FindRanks( s )
-            for i,item in enumerate(scores):
-                item.position = ranks[i]+1
+            try:
+                ranks = ranker.FindRanks( s )
+                for i,item in enumerate(scores):
+                    item.position = ranks[i]+1
+            except AssertionError, e:
+                logging.error('Main#get_scores: Ranking out of range')
+                for i,item in enumerate(scores):
+                    item.position = offset + i + 1
         else:
             for i,item in enumerate(scores):
                 item.position = offset + i + 1

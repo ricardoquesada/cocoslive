@@ -255,9 +255,12 @@ class GetScores(BaseHandler):
         for r in results:
             self.entity_to_json(r, fields)
 
-        if self.game.ranking_enabled:
-            ranker = self.get_ranker( self.game.key(), category )
-            self.update_json_with_positions( ranker )
+        try:
+            if self.game.ranking_enabled:
+                ranker = self.get_ranker( self.game.key(), category )
+                self.update_json_with_positions( ranker )
+        except AssertionError, e:
+            logging.error('API get-scores: Ranking out of range')
 
         # to comply with JSON parser in objective-c
         # a dictionary shall be the first element
@@ -677,10 +680,6 @@ class UpdateScore(BaseHandler):
         if self.new_score or (desc_score and score.cc_score > old_score) or (not desc_score and score.cc_score < old_score):
             score_country = self.get_or_create_country( country )
 
-            # runs in transaction
-            self.update_score( score, score_country )
-            score_updated = True
-
             if self.game.ranking_enabled:
                 # BUG XXX should run in another transaction
                 ranker = self.get_or_create_ranker( self.game.key(), self.category )
@@ -691,6 +690,11 @@ class UpdateScore(BaseHandler):
                     logging.error('API update-score: score outside ranking range')
                     self.response.out.write('ERROR: score outside ranking range')
                     return
+
+            # runs in transaction
+            self.update_score( score, score_country )
+            score_updated = True
+
 
         if self.game.ranking_enabled:
             ranker = self.get_ranker( self.game.key(), self.category )

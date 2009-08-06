@@ -1,5 +1,8 @@
 v0.3.4: 
  . Admin: Option to display games that are not ready
+ . API: check for ranking range before update the score
+ . API: if error with rankings, display positions normally
+ . Web: if error with rankings, display positions normally
 
 v0.3.3: 14-Jul-2009
  . API: Possibility to delete scores when rankings are enabled
