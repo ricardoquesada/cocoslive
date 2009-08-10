@@ -817,7 +817,10 @@ class EditScores(BaseHandler):
                 #NOTE: this is the implementation to get profile ID in api.py
                 profile_id = "%s@%s" % (score.cc_playername, score.cc_device_id)
                 ranker = self.get_ranker( game.key(), score.cc_category )
-                ranker.SetScore( profile_id, None )
+                try:
+                    ranker.SetScore( profile_id, None )
+                except Exception, e:
+                    logging.error('DeleteScore: cannot delete score from ranking')
 
             self.delete_score_transac( score, game, score_country ) #Delete score from DB after score is deleted from Ranker
 

@@ -1,17 +1,20 @@
-v0.3.4: 
+v0.3.5 -
+ . Users: try/except around DeleteScore with ranking
+
+v0.3.4 - 8-Ago-2009
  . Admin: Option to display games that are not ready
  . API: check for ranking range before update the score
  . API: if error with rankings, display positions normally
  . Web: if error with rankings, display positions normally
 
-v0.3.3: 14-Jul-2009
+v0.3.3 - 14-Jul-2009
  . API: Possibility to delete scores when rankings are enabled
  . API: check the score range before updating it
  . Admin: Easier to list games and developers
  . Examples: updated examples. Don't use usr_playername. Instead use cc_playername
  . EditGame: new games has a default category
 
-v0.3.2: dd-Jun-2009
+v0.3.2 - dd-Jun-2009
  . API: Can't delete scores when rankings are enabled
  . API: Rankings (experimental) added
  . API: update-score supports emtpy cc_playername
