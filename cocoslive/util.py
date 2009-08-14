@@ -13,6 +13,17 @@ from google.appengine.api import urlfetch
 from google.appengine.api import memcache
 
 
+# IMPORTNAT:
+# If you are running your own instance of the server, you should replace
+# geoutil.get_services() with a free service like:
+#
+#    services = ['http://geoip.wtanaka.com/cc/%s','http://abusebutler.appspot.com/loc/%s']
+#    services = ['http://abusebutler.appspot.com/loc/%s','http://geoip.wtanaka.com/cc/%s']
+#
+# geoutil is not commited to the SVN because it contains the key used for the Geo IP service
+#
+import geoutil
+
 __all__ = ['getGeoIPCode']
 
 def getGeoIPCode(ipaddr):
@@ -21,9 +32,8 @@ def getGeoIPCode(ipaddr):
     data = memcache.get(memcache_key)
     if data is not None:
         return data
-  
-    services = ['http://geoip.wtanaka.com/cc/%s','http://abusebutler.appspot.com/loc/%s']
-#    services = ['http://abusebutler.appspot.com/loc/%s','http://geoip.wtanaka.com/cc/%s']
+ 
+    services = geoutil.get_services()
     geoipcode = ''
 
     for service in services:
@@ -33,7 +43,8 @@ def getGeoIPCode(ipaddr):
                 geoipcode = fetch_response.content
 
             geoipcode = geoipcode.strip().lower()
-            if geoipcode == 'none' or geoipcode =='':
+            if geoipcode.startswith('(null)') or geoipcode == 'none' or geoipcode =='':
+                geoipcode = ''
                 continue
             else:
                 break
@@ -47,6 +58,6 @@ def getGeoIPCode(ipaddr):
     else:
         geoipcode = 'xx'
 
-    memcache.set(memcache_key, geoipcode)
+    memcache.add(memcache_key, geoipcode)
 
     return geoipcode

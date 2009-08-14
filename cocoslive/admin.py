@@ -31,6 +31,7 @@ from google.appengine.ext.webapp import template
 from google.appengine.api import users
 from google.appengine.ext import db
 from google.appengine.api import images
+from google.appengine.api import memcache
 
 # local imports
 from model import Developer, Game, Score, ScoreField, Category, DefaultValues
@@ -254,6 +255,17 @@ class ListGamesNotReady(BaseHandler):
         game.put()
 # 
 #
+# '/admin/memcache' handler
+#
+class MemCache(BaseHandler):
+
+    @admin_required
+    def get(self):
+        status = memcache.get_stats()
+        params = { 'status' : status }
+        self.respond('admin-cache', params)
+# 
+#
 # '/admin/list-devs' handler
 #
 class ListDevelopers(BaseHandler):
@@ -352,6 +364,7 @@ application = webapp.WSGIApplication([
         ('/admin/list-games-ready', ListGamesReady),
         ('/admin/default-values', Defaults),
         ('/admin/list-devs-updates', ListDevelopersUpdates),
+        ('/admin/memcache', MemCache),
         ('/admin/', AdminHandler),
         ],
         debug=True)

@@ -474,7 +474,8 @@ class EditGame(BaseHandler):
             return
 
         # game belongs to developer ?
-        game = dev.games.filter( 'name =', gamename ).fetch(limit = 1)[0]
+        game = Game.get_by_key_name( gamename )
+#        game = dev.games.filter( 'name =', gamename ).fetch(limit = 1)[0]
         if not game:
             logging.error('Game not found')
             return 
