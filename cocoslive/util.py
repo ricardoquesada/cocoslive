@@ -58,6 +58,7 @@ def getGeoIPCode(ipaddr):
     else:
         geoipcode = 'xx'
 
-    memcache.add(memcache_key, geoipcode)
+    time = 60 * 60 * 24 * 30    # 30 days
+    memcache.set(memcache_key, geoipcode, time)
 
     return geoipcode

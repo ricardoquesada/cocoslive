@@ -1,4 +1,6 @@
-v0.3.5 -
+v0.3.5 - 14-Ago-2009
+ . Admin:  Possibility to view/flush the memcache
+ . API: Using correct GEO IP DB
  . Users: try/except around DeleteScore with ranking
 
 v0.3.4 - 8-Ago-2009

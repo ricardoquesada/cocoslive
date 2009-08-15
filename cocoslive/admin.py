@@ -266,6 +266,16 @@ class MemCache(BaseHandler):
         self.respond('admin-cache', params)
 # 
 #
+# '/admin/flush-cache' handler
+#
+class FlushMemCache(BaseHandler):
+
+    @admin_required
+    def get(self):
+        status = memcache.flush_all()
+        self.redirect('/admin/memcache' )
+# 
+#
 # '/admin/list-devs' handler
 #
 class ListDevelopers(BaseHandler):
@@ -365,6 +375,7 @@ application = webapp.WSGIApplication([
         ('/admin/default-values', Defaults),
         ('/admin/list-devs-updates', ListDevelopersUpdates),
         ('/admin/memcache', MemCache),
+        ('/admin/flush-cache', FlushMemCache),
         ('/admin/', AdminHandler),
         ],
         debug=True)
