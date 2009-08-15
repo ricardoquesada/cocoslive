@@ -25,9 +25,21 @@ except Exception, e:
 
 __all__ = ['getGeoIPCode']
 
+def ipaddr_to_hex( ipaddr ):
+    '''converts an ipaddress to it's hexadecimal representation to reduce memory on the memcache'''
+    ret = '00000000'
+    try:
+        l = ipaddr.split('.')
+        ints = map( lambda y: int(y), l )
+        ret = '%02x%02x%02x%02x' % ( ints[0], ints[1], ints[2], ints[3] )
+    except Exception, e:
+        pass
+    return ret
+
 def getGeoIPCode(ipaddr):
 
-    memcache_key = "gip_%s" % ipaddr
+    hex_ipaddr = ipaddr_to_hex( ipaddr)
+    memcache_key = "gip_%s" % hex_ipaddr
     data = memcache.get(memcache_key)
     if data is not None:
         return data
