@@ -31,11 +31,7 @@ def ipaddr_to_hex( ipaddr ):
     try:
         l = ipaddr.split('.')
         ints = map( lambda y: int(y), l )
-#        ret = '%02x%02x%02x%02x' % ( ints[0], ints[1], ints[2], ints[3] )
-
-        # returns the ip address + netmask of 255.255.255.0
-        # since classes C aren't divided between different countries
-        ret = '%02x%02x%02x' % ( ints[0], ints[1], ints[2] )
+        ret = '%02x%02x%02x%02x' % ( ints[0], ints[1], ints[2], ints[3] )
     except Exception, e:
         pass
     return ret
@@ -44,8 +40,13 @@ def getGeoIPCode(ipaddr):
 
     hex_ipaddr = ipaddr_to_hex( ipaddr)
 
+    # use the 20 first bits for the cache.
+    # it is assumed that the rest 12 bits belongs to the same country
+    # this reduces queries and memory, and improves performance
+    netmask = hex_ipaddr[0:5]
+
     # new memcache key (6 bytes)
-    new_memcache_key = "%s" % hex_ipaddr
+    new_memcache_key = "%s" % netmask
 
     data = memcache.get(new_memcache_key)
     if data is not None:
