@@ -136,8 +136,8 @@ class GetScores(BaseHandler):
         if limit > 100:
             raise Exception("GetScores: limit can't be greater than 100")
 
-        if self.game.ranking_enabled and limit > 40:
-            raise Exception("GetScores: limit can't be greater than 40 when rankings are enabled")
+        if self.game.ranking_enabled and limit > 50:
+            raise Exception("GetScores: limit can't be greater than 50 when rankings are enabled")
 
         return limit
 
