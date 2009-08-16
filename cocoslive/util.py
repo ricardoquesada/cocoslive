@@ -39,8 +39,19 @@ def ipaddr_to_hex( ipaddr ):
 def getGeoIPCode(ipaddr):
 
     hex_ipaddr = ipaddr_to_hex( ipaddr)
-    memcache_key = "gip_%s" % hex_ipaddr
-    data = memcache.get(memcache_key)
+
+    # old memcache key (12 bytes)
+    old_memcache_key = "gip_%s" % hex_ipaddr
+    new_memcache_key = "%s" % hex_ipaddr
+
+    data = memcache.get(old_memcache_key)
+    if data is not None:
+        memcache.delete( old_memcache_key )
+        memcache.set( new_memcache_key, data, 0)
+        return data
+
+    # new memcache key (8 bytes)
+    data = memcache.get(new_memcache_key)
     if data is not None:
         return data
  
@@ -71,6 +82,6 @@ def getGeoIPCode(ipaddr):
 
 #    time = 60 * 60 * 24 * 30    # 30 days
     time = 0                # never expires
-    memcache.set(memcache_key, geoipcode, time)
+    memcache.set(new_memcache_key, geoipcode, time)
 
     return geoipcode

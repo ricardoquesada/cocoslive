@@ -18,7 +18,7 @@ indexes:
   - name: creationdate
     direction: desc
 
-# Used 7 times in query history.
+# Used 11 times in query history.
 - kind: Game
   properties:
   - name: owner
@@ -104,7 +104,7 @@ indexes:
   - name: cc_game
   - name: cc_score
 
-# Used 11 times in query history.
+# Used 16 times in query history.
 - kind: Score
   ancestor: yes
   properties:
@@ -120,7 +120,7 @@ indexes:
   - name: cc_category
   - name: cc_score
 
-# Used 24 times in query history.
+# Used 29 times in query history.
 - kind: Score
   ancestor: yes
   properties:
