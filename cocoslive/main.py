@@ -324,6 +324,7 @@ class GamesUsingCocosLive(BaseHandler):
 
         params = {
             'games' : games,
+            'total' : games.count(),
             'page' : {'title' : 'Games Using Cocos Live'},
         }
         self.respond('games', params)

@@ -150,6 +150,7 @@ class ListGamesReady(BaseHandler):
 
         params = {
             'games' : games,
+            'total' : games.count(),
             'page' : {'title' : 'Games'},
         }
         self.respond('admin-games-ready', params)
@@ -208,6 +209,7 @@ class ListGamesNotReady(BaseHandler):
 
         params = {
             'games' : games,
+            'total' : games.count(),
             'page' : {'title' : 'Games'},
         }
         self.respond('admin-games', params)

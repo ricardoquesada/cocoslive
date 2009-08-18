@@ -1,5 +1,7 @@
 v0.3.6 - XX-xxx-2009
  . GeoIP: ipaddress is stored as hexa on the memcache
+ . Admin: see total number of games
+ . Main: see total number of games
 
 v0.3.5 - 14-Ago-2009
  . Admin:  Possibility to view/flush the memcache
