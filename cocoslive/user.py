@@ -494,11 +494,37 @@ class EditGame(BaseHandler):
             self.update_displayweb( game )
         elif type == 'use_new_playername':
             self.use_new_playername( game )
+        elif type == 'enable_ranking':
+            self.enable_ranking( game )
         else:
             logging.error('Type not found')
             self.error(404)
 
         self.redirect('/user/edit-game?gamename=%s' % gamename )
+
+    # enable ranking
+    def enable_ranking( self, game ):
+        if game.ranking_enabled:
+            raise Exception("Ranking is already enabled")
+
+        if game.nro_scores != 0:
+            raise Exception("Delete all the game scores to enable rankings")
+
+        if game.scoreorder != 'desc':
+            raise Exception("Ranking only works with Descending scores")
+
+        enabled = (self.request.get('rank_enabled') == 'True' )
+
+        min = self.request.get('rank_min_score')
+        max = self.request.get('rank_max_score')
+        min = int(min)
+        max = int(max)
+
+        game.ranking_min_score = min
+        game.ranking_max_score = max
+        game.ranking_enabled = enabled
+        game.put()
+
 
     # use (or don't use) new playername
     def use_new_playername(self, game ):

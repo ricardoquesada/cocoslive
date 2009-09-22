@@ -1,7 +1,10 @@
-v0.3.6 - XX-xxx-2009
+v0.3.6 - 22-Sept-2009
  . GeoIP: ipaddress is stored as hexa on the memcache
  . Admin: see total number of games
  . Main: see total number of games
+ . API: created QueryHandler class to reduce duplicate methods
+ . Model: Added NumberOfQueries class. Not used yet
+ . User: Can enable rankings using the Web interface
 
 v0.3.5 - 14-Ago-2009
  . Admin:  Possibility to view/flush the memcache

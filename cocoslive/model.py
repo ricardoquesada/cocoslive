@@ -11,7 +11,10 @@ __docformat__ = 'restructuredtext'
 
 from google.appengine.ext import db
 
-__all__ = ['Developer', 'Game', 'Score', 'ScoreField', 'Category', 'ScoresCountry', 'DefaultValues' ]
+__all__ = ['Developer', 'Game', 'Score', 'ScoreField', 'Category', 'ScoresCountry',
+    'DefaultValues',
+    'NumberOfQueries',
+]
 
 #
 # Model:
@@ -84,7 +87,7 @@ class Game(db.Model):
     ranking_enabled = db.BooleanProperty( default=False, required=False)
 
     #: ranking: max score
-    ranking_max_score = db.IntegerProperty( default=20000, required=False)
+    ranking_max_score = db.IntegerProperty( default=99999999, required=False)
 
     #: ranking: max score
     ranking_min_score = db.IntegerProperty(default=0, required=False)
@@ -161,6 +164,18 @@ class ScoresCountry( db.Model ):
     game = db.ReferenceProperty( Game, collection_name = 'nro_scores_country' )
     country_code = db.StringProperty( required = True)
     quantity = db.IntegerProperty( required = True )
+
+#
+# Number of queries
+#
+
+class NumberOfQueries( db.Model ):
+    # game that they belong to
+    game = db.ReferenceProperty( Game, collection_name = 'number_of_queries' )
+    # new scores / update scores
+    quantity_push = db.IntegerProperty( required = True, default = 0 )
+    # query scores
+    quantity_pop = db.IntegerProperty( required = True, default = 0 )
 
 #
 # Default Values

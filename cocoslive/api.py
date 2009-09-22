@@ -12,6 +12,7 @@ __docformat__ = 'restructuredtext'
 # python imports
 import os
 import datetime
+import time
 import hashlib
 import logging
 
@@ -28,7 +29,7 @@ from ranker.common import transactional
 import simplejson as json
 
 # local imports
-from model import Game, Score, ScoreField, ScoresCountry 
+from model import *
 from util import *
 
 from ranker import ranker
@@ -55,7 +56,6 @@ class BaseHandler( webapp.RequestHandler):
             app["ranker"] = r.rootkey
             datastore.Put(app)
             return r
-
 
 
     def validate_name(self, gamename ='gamename'):
@@ -92,7 +92,115 @@ QueryFlagByCountry = 1 << 0
 QueryFlagByDevice = 1 << 1
 
 
-class GetScores(BaseHandler):
+class QueryHandler(BaseHandler):
+
+    def validate_checksum( self ):
+        '''validate checksum
+        returns:
+            True if checksum is OK
+        '''
+        hash = hashlib.md5()
+        args = self.request.arguments()
+
+        # sort in place
+        args.sort()
+
+        for arg in args:
+            if arg.startswith('usr_'):
+                str = self.request.get(arg).encode('utf-8')
+                hash.update( str )
+            elif (arg == 'cc_category' or arg == 'cc_score' or arg=='cc_playername'):
+                str = self.request.get(arg).encode('utf-8')
+                hash.update( str )
+
+        hash.update( self.game.gamekey )
+
+        bool = hash.hexdigest() == self.request.get('cc_hash')
+
+        if not bool:
+            self.response.set_status(400)
+            self.response.out.write('Invalid hash value')
+        return bool
+
+
+    def cast_value_to_type( self, key, value ):
+        '''cast a value to a certain type given it's key'''
+
+        query = db.Query(ScoreField)
+        query.filter('name = ', key).ancestor(self.game)
+        result = query.fetch(1)[0]
+
+        if result.type == 'int':
+            return int(value)
+        if result.type == 'float':
+            return float(value)
+        # don't cast strings... they are already strings
+        return value
+
+
+    def increment_number_of_push_queries( self, list_of_kinds):
+        '''Increments the total number of push queries'''
+        for kind in lis_of_kinds:
+            kind.quantity_push += 1
+            kind.put()
+
+
+    def increment_number_of_pop_queries( self, list_of_kinds):
+        '''Increments the total number of push queries'''
+        for kind in lis_of_kinds:
+            kind.quantity_pop += 1
+            kind.put()
+
+    def get_or_create_number_of_queries( self ):
+        '''returns or creates the the kind queries'''
+        entities = []
+
+        t = time.time()
+        year = t[0]         # number of year
+        month = t[1]        # number of month
+        day = t[7]          # number of day
+        week = day / 7      # number of week
+        values = [ 0, year, month, week, day ]
+        key = ['all_','year_', 'month_', 'week_', 'day_']
+        for i in range( len(key) ):
+            entity = db.Model.get_or_insert(  \
+                '%s_%d' % (key[i], value[i]),   # key name
+                parent = self.game,             # parent
+                game = self.game,               # game that it belongs to (similar to parent )
+                )
+            entities.append( entity )
+
+        return kinds
+
+
+    def update_total_scores( self ):
+        ''' updates the total number of scores.'''
+        # Quantity of scores +1
+        self.game.nro_scores +=1 
+        self.game.put()
+
+
+    def update_scores_by_country(self, score_country ):
+        '''updates the total number of scores by country'''
+        score_country.quantity += 1
+        score_country.put()
+
+
+    # XXX: possible race condition. use Model.get_or_insert() instead
+    def get_or_create_country( self, country ):
+        '''returns a new country if it doesn't exist or the current one if it exists'''
+        query = db.Query(ScoresCountry)
+        query.ancestor( self.game )
+        query.filter('country_code =', country)
+        result = query.fetch(limit=1)
+        if query.count() > 0:
+            score_country= result[0]
+        else:
+            score_country = ScoresCountry( parent=self.game, game=self.game, country_code=country, quantity=0 )
+        return  score_country
+
+
+class GetScores(QueryHandler):
     '''Handles the HTTP GET request to obtain the high scores
     No login is necessary
     '''
@@ -101,7 +209,6 @@ class GetScores(BaseHandler):
         super( GetScores, self ).__init__()
         self.json = []
         self.position = 0
-
 
     def entity_to_json(self, e, fields):
         '''Converts an entity to JSON format'''
@@ -379,81 +486,12 @@ class GetScoreForRank(BaseHandler):
 #
 # 'score/post' handler
 #
-class PostScore(BaseHandler):
-
-    def validate_checksum( self ):
-        '''validate checksum
-        returns:
-            True if checksum is OK
-        '''
-        hash = hashlib.md5()
-        args = self.request.arguments()
-
-        # sort in place
-        args.sort()
-
-        for arg in args:
-            if arg.startswith('usr_'):
-                str = self.request.get(arg).encode('utf-8')
-                hash.update( str )
-            elif (arg == 'cc_category' or arg == 'cc_score' or arg=='cc_playername'):
-                str = self.request.get(arg).encode('utf-8')
-                hash.update( str )
-
-        hash.update( self.game.gamekey )
-
-        bool = hash.hexdigest() == self.request.get('cc_hash')
-
-        if not bool:
-            self.response.set_status(400)
-            self.response.out.write('Invalid hash value')
-
-        return bool
-
-
-    def cast_value_to_type( self, key, value ):
-        '''cast a value to a certain type given it's key'''
-
-        query = db.Query(ScoreField)
-        query.filter('name = ', key).ancestor(self.game)
-        result = query.fetch(1)[0]
-
-        if result.type == 'int':
-            return int(value)
-        if result.type == 'float':
-            return float(value)
-        # don't cast strings... they are already strings
-        return value
-
-    
-    def update_total_scores( self ):
-        ''' updates the total number of scores.'''
-        # Quantity of scores +1
-        self.game.nro_scores +=1 
-        self.game.put()
-
-    def update_scores_by_country(self, score_country ):
-        '''updates the total number of scores by country'''
-        score_country.quantity += 1
-        score_country.put()
-
-    # XXX: possible race condition. use Model.get_or_insert() instead
-    def get_or_create_country( self, country ):
-        '''returns a new country if it doesn't exist or the current one if it exists'''
-        query = db.Query(ScoresCountry)
-        query.ancestor( self.game )
-        query.filter('country_code =', country)
-        result = query.fetch(limit=1)
-        if query.count() > 0:
-            score_country= result[0]
-        else:
-            score_country = ScoresCountry( parent=self.game, game=self.game, country_code=country, quantity=0 )
-        return  score_country
+class PostScore(QueryHandler):
 
     # This methods is run inside a transaction
     # All updates shall be done in the 'self.game' context
     @transactional
-    def post_score( self, score, score_country ):
+    def post_score( self, score, score_country, number_of_queries_entities ):
 
         # save score
         score.put()
@@ -464,6 +502,8 @@ class PostScore(BaseHandler):
         # update scores by country
         self.update_scores_by_country( score_country )
 
+        # XXX: update number of posts
+#        self.increment_number_of_push_queries( number_of_queries_entities )
 
     def get(self):
         pass
@@ -510,8 +550,12 @@ class PostScore(BaseHandler):
 
         score_country = self.get_or_create_country( country )
 
+        # the entities representing the total number of queries (all time, year, month, week, day)
+#        number_of_queries_entities = self.get_or_create_number_of_queries()
+
         # runs in trasaction
-        self.post_score( score, score_country )
+#        self.post_score( score, score_country, number_of_queries_entities )
+        self.post_score( score, score_country, 0)
 
         # answer OK
         self.response.out.write('OK')
@@ -519,76 +563,7 @@ class PostScore(BaseHandler):
 #
 # 'score/update' handler
 #
-class UpdateScore(BaseHandler):
-
-    def validate_checksum( self ):
-        '''validate checksum
-        returns:
-            True if checksum is OK
-        '''
-        hash = hashlib.md5()
-        args = self.request.arguments()
-
-        # sort in place
-        args.sort()
-
-        for arg in args:
-            if arg.startswith('usr_'):
-                str = self.request.get(arg).encode('utf-8')
-                hash.update( str )
-            elif (arg == 'cc_category' or arg == 'cc_score' or arg=='cc_playername'):
-                str = self.request.get(arg).encode('utf-8')
-                hash.update( str )
-
-        hash.update( self.game.gamekey )
-
-        bool = hash.hexdigest() == self.request.get('cc_hash')
-
-        if not bool:
-            self.response.set_status(400)
-            self.response.out.write('Invalid hash value')
-
-        return bool
-
-
-    def cast_value_to_type( self, key, value ):
-        '''cast a value to a certain type given it's key'''
-
-        query = db.Query(ScoreField)
-        query.filter('name = ', key).ancestor(self.game)
-        result = query.fetch(1)[0]
-
-        if result.type == 'int':
-            return int(value)
-        if result.type == 'float':
-            return float(value)
-        # don't cast strings... they are already strings
-        return value
-
-    
-    def update_total_scores( self ):
-        ''' updates the total number of scores.'''
-        # Quantity of scores +1
-        self.game.nro_scores +=1 
-        self.game.put()
-
-    def update_scores_by_country(self, score_country ):
-        '''updates the total number of scores by country'''
-        score_country.quantity += 1
-        score_country.put()
-
-    # XXX: possible race condition
-    def get_or_create_country( self, country ):
-        '''returns a new country if it doesn't exist or the current one if it exists'''
-        query = db.Query(ScoresCountry)
-        query.ancestor( self.game )
-        query.filter('country_code =', country)
-        result = query.fetch(limit=1)
-        if query.count() > 0:
-            score_country= result[0]
-        else:
-            score_country = ScoresCountry( parent=self.game, game=self.game, country_code=country, quantity=0 )
-        return  score_country
+class UpdateScore(QueryHandler):
 
     # This methods is run inside a transaction
     # All updates shall be done in the 'self.game' context

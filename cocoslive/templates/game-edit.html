@@ -215,16 +215,58 @@ The benefits of using <i>cc_</i> fields is that they can be queried.
 </fieldset>
 </div>
 
-{# Ranking #}
-<div><form action="/user/edit-game" method="post" id="new_playername_form">
-<fieldset><legend>Enable Rankings (experimental feature. Contact <a href="http://www.cocos2d-iphone.org/forum/forum/4">admin</a> to enable it)</legend>
-            <div><label>Enable Rankings:</label>{{game.ranking_enabled}}
-            <div><label>Ranking Max Score:</label>{{game.ranking_max_score}}
-            <div><label>Ranking Min Score:</label>{{game.ranking_min_score}}
-            <div><label>Ranking Branch Factor:</label>{{game.ranking_branch_factor}}
-            </div>
+{# Enable Ranking #}
+<div>
+<fieldset><legend>Ranking Settings (EXPERIMENTAL feature). To know more about this feature, contact <a href="http://www.cocos2d-iphone.org/forum/forum/4">admin</a></legend>
+<div><label>Ranking limitations</label>
+<ul>
+<li>Only works in Integer Scores. It doesn't work with floats or strings scores</li>
+<li>Order must be descending (Best score is the higher score)</li>
+<li>Only works with "udpate_score". It doesn't work with "new_score"</li>
+<li>You must delete all your scores to enable it</li>
+<li>Once enabled, you won't be able to modify it's properties.</li>
+<li>Make sure your max score is big enough!!</li>
+<li>Under certain circumstances (race conditions) the rankings could be un-synced</li>
+</ul>
+</div>
+<form name="input" action="/user/edit-game" method="post">
+
+
+{% if game.ranking_enabled %}
+{# Rankings enabled #}
+<div><label>Enable Rankings:</label>{{game.ranking_enabled}}</div>
+<div><label>Ranking Max Score:</label>{{game.ranking_max_score}}</div>
+<div><label>Ranking Min Score:</label>{{game.ranking_min_score}}</div>
+<div><label>Ranking Branch Factor:</label>{{game.ranking_branch_factor}}</div>
+{% else %}
+{# Rankings disabled #}
+{# Branch Factor #}
+<div><label>Ranking Branch Factor:</label>{{game.ranking_branch_factor}}</div>
+{# Rank Min Score#}
+<div><label>Ranking Min score:</label>
+<input type="text" name="rank_min_score" value="{{game.ranking_min_score}}" size="20">
+</div>
+{# Rank Max Score#}
+<div><label>Ranking Max score:</label>
+<input type="text" name="rank_max_score" value="{{game.ranking_max_score}}" size="20">
+</div>
+{# Rank Enabled #}
+<div><label>Ranking enabled:</label>
+    <select name="rank_enabled">
+        <option selected>True</option>
+        <option>False</option>
+    </select>
+</div>
+{# Hidden tags #}
+<input type="hidden" name="gamename" value="{{game.name}}">
+<input type="hidden" name="type" value="enable_ranking">
+{# action #}
+<input type="submit" value="Update Rankings settings">
+</form>
+{% endif %}
 </fieldset>
-</form></div>
+</div>
+
 
 {# Delete Scores#}
 <form action="/user/delete-scores" method="post" id="delete_scores_form">
