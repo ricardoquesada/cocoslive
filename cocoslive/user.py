@@ -893,7 +893,7 @@ class DeleteCategory(BaseHandler):
             return
 
         # game belongs to developer ?
-        game = dev.games.filter( 'name =', gamename ).fetch(limit = 1)[0]
+        game = Game.get_by_key_name( gamename )
         if not game:
             logging.error('DeleteCategory: Game not not found')
             return 
@@ -935,7 +935,8 @@ class DeleteField(BaseHandler):
             return
 
         # game belongs to developer ?
-        game = dev.games.filter( 'name =', gamename ).fetch(limit = 1)[0]
+#        game = dev.games.filter( 'name =', gamename ).fetch(limit = 1)[0]
+        game = Game.get_by_key_name( gamename )
         if not game:
             logging.error('Game not not found')
             return 
