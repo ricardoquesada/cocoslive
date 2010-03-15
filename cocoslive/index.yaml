@@ -11,20 +11,17 @@ indexes:
 # automatically uploaded to the admin console when you next deploy
 # your application using appcfg.py.
 
-# Unused in query history -- copied from input.
 - kind: Developer
   properties:
   - name: receive_updates
   - name: creationdate
     direction: desc
 
-# Used 3 times in query history.
 - kind: Game
   properties:
   - name: owner
   - name: creationdate
 
-# Unused in query history -- copied from input.
 - kind: Score
   ancestor: yes
   properties:
@@ -33,7 +30,6 @@ indexes:
   - name: cc_game
   - name: cc_score
 
-# Unused in query history -- copied from input.
 - kind: Score
   ancestor: yes
   properties:
@@ -43,7 +39,6 @@ indexes:
   - name: cc_score
     direction: desc
 
-# Unused in query history -- copied from input.
 - kind: Score
   ancestor: yes
   properties:
@@ -51,7 +46,6 @@ indexes:
   - name: cc_country
   - name: cc_score
 
-# Used once in query history.
 - kind: Score
   ancestor: yes
   properties:
@@ -60,7 +54,6 @@ indexes:
   - name: cc_score
     direction: desc
 
-# Unused in query history -- copied from input.
 - kind: Score
   ancestor: yes
   properties:
@@ -69,7 +62,6 @@ indexes:
   - name: cc_game
   - name: cc_score
 
-# Unused in query history -- copied from input.
 - kind: Score
   ancestor: yes
   properties:
@@ -79,7 +71,6 @@ indexes:
   - name: cc_score
     direction: desc
 
-# Unused in query history -- copied from input.
 - kind: Score
   ancestor: yes
   properties:
@@ -87,7 +78,6 @@ indexes:
   - name: cc_device_id
   - name: cc_score
 
-# Used once in query history.
 - kind: Score
   ancestor: yes
   properties:
@@ -96,7 +86,6 @@ indexes:
   - name: cc_score
     direction: desc
 
-# Unused in query history -- copied from input.
 - kind: Score
   ancestor: yes
   properties:
@@ -104,7 +93,6 @@ indexes:
   - name: cc_game
   - name: cc_score
 
-# Unused in query history -- copied from input.
 - kind: Score
   ancestor: yes
   properties:
@@ -113,14 +101,12 @@ indexes:
   - name: cc_score
     direction: desc
 
-# Unused in query history -- copied from input.
 - kind: Score
   ancestor: yes
   properties:
   - name: cc_category
   - name: cc_score
 
-# Used 23 times in query history.
 - kind: Score
   ancestor: yes
   properties:
